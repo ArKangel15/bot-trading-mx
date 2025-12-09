@@ -2,6 +2,31 @@ import streamlit as st
 import pandas as pd
 from bot_trading import analizar, acciones
 
+# Forzar modo claro en toda la app
+import streamlit as st
+st.set_page_config(page_title="Bot de Trading MX", layout="wide")
+st.markdown(
+    """
+    <style>
+    @media (prefers-color-scheme: dark) {
+        html, body, [data-testid="stAppViewContainer"] {
+            background-color: white !important;
+            color: black !important;
+        }
+        .stCard, .stDataFrame, .stTable, .element-container {
+            background-color: white !important;
+            color: black !important;
+        }
+        h1, h2, h3, h4, h5, h6, p, div {
+            color: black !important;
+        }
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
 st.title("📈 Bot de Trading — Acciones Mexicanas")
@@ -48,3 +73,4 @@ for idx, row in tabla.iterrows():
         """,
         unsafe_allow_html=True
     )
+
