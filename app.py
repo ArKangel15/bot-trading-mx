@@ -59,12 +59,13 @@ for _, fila in tabla.iterrows():
         <!-- MACD -->
         <h3 style="margin-top:20px;">📉 MACD</h3>
         <p style="font-size:17px;">
-
+        {macd_color} <strong>{fila['MACD Señal']}</strong><br>
 
     </div>
     """
 
     components.html(html, height=200)
+
 
 
 
