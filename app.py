@@ -39,9 +39,9 @@ st.download_button(
 )
 
 # ================================
-# TARJETAS ESTILO BLOOMBERG (PRUEBA)
+# TARJETAS ESTILO BLOOMBERG — PRUEBA 2
 # ================================
-st.subheader("📊 Análisis Individual por Acción — PRUEBA")
+st.subheader("📊 Análisis Individual por Acción — PRUEBA 2")
 
 for _, fila in tabla.iterrows():
 
@@ -49,14 +49,23 @@ for _, fila in tabla.iterrows():
         f"""
         <div style="
             background-color:#ffffff;
-            padding:20px;
-            border-radius:15px;
-            margin-bottom:20px;
+            padding:25px;
+            border-radius:20px;
+            margin-bottom:25px;
             border:1px solid #cccccc;
-            font-size:22px;
         ">
-            📌 <strong>{fila['Ticker']}</strong> — 
-            <span style="color:#0066ff;">{fila['Señal Final']}</span>
+
+            <!-- TITULO -->
+            <h2 style="margin:0; font-size:26px;">
+                📌 <strong>{fila['Ticker']}</strong> — 
+                <span style="color:#0066ff;">{fila['Señal Final']}</span>
+            </h2>
+
+            <!-- PRECIO -->
+            <p style="font-size:18px; margin-top:10px;">
+                💲 <strong>Precio actual:</strong> {fila['Precio']}
+            </p>
+
         </div>
         """,
         unsafe_allow_html=True
