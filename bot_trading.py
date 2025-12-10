@@ -3,205 +3,171 @@ warnings.filterwarnings("ignore")
 
 import yfinance as yf
 import pandas as pd
-import numpy as np
-from ta.momentum import RSIIndicator
-from ta.trend import EMAIndicator, MACD
-from ta.volatility import BollingerBands
+from datetime import datetime
+
+# ============================================================
+#               FUNCIONES DE INDICADORES TÉCNICOS
+# ============================================================
+
+def macd_manual(close):
+    ema12 = close.ewm(span=12, adjust=False).mean()
+    ema26 = close.ewm(span=26, adjust=False).mean()
+    macd_series = ema12 - ema26
+    macd_value = macd_series.iloc[-1]
+    signal_value = macd_series.ewm(span=9, adjust=False).mean().iloc[-1]
+    return float(macd_value), float(signal_value)
+
+
+def bollinger_manual(close):
+    mid = close.rolling(20).mean().iloc[-1]
+    std = close.rolling(20).std().iloc[-1]
+    upper = mid + 2 * std
+    lower = mid - 2 * std
+    return float(upper), float(lower)
+
+
+def kdj_manual(high, low, close):
+    low_min = low.rolling(14).min().iloc[-1]
+    high_max = high.rolling(14).max().iloc[-1]
+    rsv = ((close.iloc[-1] - low_min) / (high_max - low_min)) * 100
+    K = (2/3) * 50 + (1/3) * rsv
+    D = (2/3) * 50 + (1/3) * K
+    J = 3 * K - 2 * D
+    return float(K), float(D), float(J)
+
+def rsi_manual(close, period=14):
+    delta = close.diff()
+    gain = delta.where(delta > 0, 0).rolling(period).mean()
+    loss = -delta.where(delta < 0, 0).rolling(period).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    return float(rsi.iloc[-1])
 
 
 # ============================================================
 #                    ANALIZAR UNA ACCIÓN
 # ============================================================
+
 def analizar(ticker):
-    try:
-        data = yf.download(ticker, period="6mo", interval="1d")
-        if data.empty:
-            return None
-    except:
+    data = yf.download(ticker, period="6mo", interval="1d")
+
+    if data.empty:
         return None
 
-    close = data["Close"]
+    precio = float(data["Close"].iloc[-1])
 
-    # ================= INDICADORES =================
+    # Indicadores base
+    macd, signal = macd_manual(data["Close"])
+    upper, lower = bollinger_manual(data["Close"])
+    K, D, J = kdj_manual(data["High"], data["Low"], data["Close"])
+    rsi = rsi_manual(data["Close"])
 
-    # MACD
-    macd_ind = MACD(close)
-    data["MACD"] = macd_ind.macd()
-    data["SIGNAL"] = macd_ind.macd_signal()
-
-    # KDJ
-    low = data["Low"].rolling(14).min()
-    high = data["High"].rolling(14).max()
-    data["RSV"] = (close - low) / (high - low) * 100
-    data["K"] = data["RSV"].ewm(alpha=1/3).mean()
-    data["D"] = data["K"].ewm(alpha=1/3).mean()
-    data["J"] = 3 * data["K"] - 2 * data["D"]
-
-    # RSI
-    rsi = RSIIndicator(close)
-    data["RSI"] = rsi.rsi()
-
-    # EMAs
-    data["EMA50"] = EMAIndicator(close, 50).ema_indicator()
-    data["EMA200"] = EMAIndicator(close, 200).ema_indicator()
-
-    # Bollinger Bands
-    bb = BollingerBands(close)
-    data["boll_low"] = bb.bollinger_lband()
-    data["boll_high"] = bb.bollinger_hband()
+    # Medias móviles
+    ema20 = float(data["Close"].ewm(span=20).mean().iloc[-1])
+    ema50 = float(data["Close"].ewm(span=50).mean().iloc[-1])
+    ema200 = float(data["Close"].ewm(span=200).mean().iloc[-1])
 
     # Volumen
-    data["vol_prom20"] = data["Volume"].rolling(20).mean()
+    vol = float(data["Volume"].iloc[-1])
+    vol_avg20 = float(data["Volume"].rolling(20).mean().iloc[-1])
 
-    # ================= OBTENER ÚLTIMO DATO =================
+    explicacion = []
 
-    u = data.iloc[-1]
-
-    precio = float(u["Close"])
-    macd = float(u["MACD"])
-    signal = float(u["SIGNAL"])
-    K = float(u["K"])
-    D = float(u["D"])
-    RSI = float(u["RSI"])
-    EMA50 = float(u["EMA50"])
-    EMA200 = float(u["EMA200"])
-    boll_low = float(u["boll_low"])
-    boll_high = float(u["boll_high"])
-    vol = float(u["Volume"])
-    vol_prom = float(u["vol_prom20"])
-
-    # ================= SEÑALES INDIVIDUALES =================
-
-    señales = []
-
-    # Tendencia
-    if EMA50 > EMA200:
-        señales.append("Tendencia Alcista (EMA50 > EMA200)")
-    else:
-        señales.append("Tendencia Bajista (EMA50 < EMA200)")
+    # ================= Señales individuales =================
 
     # MACD
-    if macd > signal:
-        señales.append("MACD Alcista")
+    macd_estado = "🟢 Alcista" if macd > signal else "🔴 Bajista"
+    explicacion.append("MACD > SIGNAL → alcista" if macd > signal else "MACD < SIGNAL → bajista")
+
+    # Bollinger
+    if precio < lower:
+        bol_estado = "🟢 Sobreventa"
+    elif precio > upper:
+        bol_estado = "🔴 Sobrecompra"
     else:
-        señales.append("MACD Bajista")
+        bol_estado = "🟡 Normal"
+    explicacion.append("Bollinger OK")
 
     # KDJ
-    if K > D:
-        señales.append("KDJ Alcista (K > D)")
+    kdj_estado = "🟢 Alcista" if K > D else "🔴 Bajista"
+    explicacion.append("K > D → impulso alcista" if K > D else "K < D → impulso bajista")
+
+    # RSI con semáforo
+    if rsi > 65:
+        rsi_estado = "🔴 Alto (sobrecompra)"
+    elif rsi < 45:
+        rsi_estado = "🟢 Fuerte (barato)"
     else:
-        señales.append("KDJ Bajista (K < D)")
+        rsi_estado = "🟡 Normal"
 
-    # RSI
-    if 45 <= RSI <= 65:
-        señales.append("RSI Saludable")
-    elif RSI < 30:
-        señales.append("RSI Sobrevendido")
-    elif RSI > 70:
-        señales.append("RSI Sobrecomprado")
-
-    # Volumen
-    if vol > vol_prom:
-        señales.append("Volumen Fuerte")
+    # Tendencia EMA50 / EMA200
+    if ema50 > ema200:
+        tendencia_estado = "🟢 Alcista"
+    elif abs(ema50 - ema200) < 1:
+        tendencia_estado = "🟡 Neutral"
     else:
-        señales.append("Volumen Débil")
+        tendencia_estado = "🔴 Bajista"
 
-    # ================= SEÑAL FINAL =================
+    # Precio vs EMA50
+    precio_vs_ema50 = "🟢 Encima" if precio > ema50 else "🔴 Debajo"
 
-    compra_fuerte = (
-        EMA50 > EMA200 and
-        precio > EMA50 and
-        macd > signal and
-        K > D and
-        45 <= RSI <= 65 and
-        vol > vol_prom
-    )
+    # Volumen vs promedio
+    volumen_estado = "🟢 Fuerte" if vol > vol_avg20 else "🟡 Normal"
 
-    venta_fuerte = (
-        EMA50 < EMA200 and
-        precio < EMA50 and
-        macd < signal and
-        K < D and
-        (RSI < 30 or RSI > 70) and
-        vol > vol_prom
-    )
-
-    if compra_fuerte:
-        señal_final = "COMPRA FUERTE"
-    elif venta_fuerte:
-        señal_final = "VENTA FUERTE"
-    elif macd > signal and K > D:
-        señal_final = "POSIBLE COMPRA"
-    elif macd < signal and K < D:
-        señal_final = "POSIBLE VENTA"
+    # ================= Señal Final =================
+    if macd > signal and K > D and precio < lower:
+        señal = "COMPRA FUERTE"
+    elif macd < signal and K < D and precio > upper:
+        señal = "VENTA FUERTE"
+    elif macd > signal or K > D:
+        señal = "POSIBLE COMPRA"
+    elif macd < signal or K < D:
+        señal = "POSIBLE VENTA"
     else:
-        señal_final = "NEUTRO / ESPERAR"
-
-    # ================= RETORNAR RESULTADOS =================
+        señal = "ESPERAR"
 
     return {
+        "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "Ticker": ticker,
         "Precio": round(precio, 2),
-        "MACD": round(macd, 3),
-        "Signal": round(signal, 3),
+        "MACD": round(macd, 4),
+        "Signal": round(signal, 4),
+        "Banda Superior": round(upper, 2),
+        "Banda Inferior": round(lower, 2),
         "K": round(K, 2),
         "D": round(D, 2),
-        "RSI": round(RSI, 2),
-        "EMA50": round(EMA50, 2),
-        "EMA200": round(EMA200, 2),
-        "Volumen": int(vol),
-        "Vol Prom 20": int(vol_prom),
-        "Bollinger Inf": round(boll_low, 2),
-        "Bollinger Sup": round(boll_high, 2),
-        "Señales": " | ".join(señales),
-        "Señal Final": señal_final,
+        "J": round(J, 2),
+        "RSI": round(rsi, 2),
+        "EMA20": round(ema20, 2),
+        "EMA50": round(ema50, 2),
+        "EMA200": round(ema200, 2),
+        "Volumen": round(vol, 0),
+        "Volumen Promedio 20": round(vol_avg20, 0),
+
+        # Estados con semáforo
+        "MACD Estado": macd_estado,
+        "Bollinger Estado": bol_estado,
+        "KDJ Estado": kdj_estado,
+        "RSI Estado": rsi_estado,
+        "Tendencia": tendencia_estado,
+        "Precio EMA50": precio_vs_ema50,
+        "Volumen Estado": volumen_estado,
+
+        "Señal Final": señal,
+        "Explicación": " | ".join(explicacion)
     }
 
 
 # ============================================================
-#                    LISTA DE ACCIONES (TAL COMO TENÍAS)
+#                   LISTA DE ACCIONES
 # ============================================================
+
 acciones = [
-    "HERDEZ.MX",
-    "TLEVISACPO.MX",
-    "MEGACPO.MX",
-    "VOLARA.MX",
-    "AUTLANB.MX",
-    "RA.MX",
-    "OMAB.MX",
-    "GAPB.MX",
-    "ALSEA.MX",
-    "BIMBOA.MX",
-    "GFINBURO.MX",
-    "SORIANAB.MX",
-    "AC.MX",
-    "GFNORTEO.MX",
-    "PINFRA.MX",
-    "GRUMAB.MX",
-    "ORBIA.MX",
-    "KIMBERA.MX",
-    "LABB.MX",
-    "CHDRAUIB.MX",
-    "GCARSOA1.MX",
-    "VESTA.MX",
-    "BBAJIOO.MX"
+    "HERDEZ.MX", "TLEVISACPO.MX", "MEGACPO.MX", "VOLARA.MX",
+    "AUTLANB.MX", "RA.MX", "OMAB.MX", "GAPB.MX",
+    "ALSEA.MX", "BIMBOA.MX", "GFINBURO.MX", "SORIANAB.MX",
+    "AC.MX", "GFNORTEO.MX", "PINFRA.MX", "GRUMAB.MX",
+    "ORBIA.MX", "KIMBERA.MX", "LABB.MX", "CHDRAUIB.MX",
+    "GCARSOA1.MX", "VESTA.MX", "BBAJIOO.MX"
 ]
-
-
-# ============================================================
-#                      PROCESAR ACCIONES
-# ============================================================
-historial = []
-
-for acc in acciones:
-    r = analizar(acc)
-    if r:
-        historial.append(r)
-
-tabla = pd.DataFrame(historial)
-tabla.to_csv("historial_trading.csv", index=False)
-print("\n================= TABLA DE SEÑALES =================")
-print(tabla)
-print("====================================================")
-print("Archivo guardado: historial_trading.csv\n")
 
