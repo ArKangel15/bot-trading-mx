@@ -56,7 +56,7 @@ for i, fila in tabla.iterrows():
             box-shadow:0px 2px 8px rgba(0,0,0,0.05);
         ">
 
-            <!-- TÍTULO -->
+            <!-- TITULO -->
             <h2 style="margin:0; font-size:28px;">
                 📌 <strong>{fila['Ticker']}</strong> — 
                 <span style="color:#0066ff;">{fila['Señal Final']}</span>
@@ -69,6 +69,7 @@ for i, fila in tabla.iterrows():
 
             <!-- INDICADORES PRINCIPALES -->
             <h3 style="margin-top:15px;">Indicadores principales</h3>
+
             <p>
                 <strong>MACD:</strong> {fila['MACD Señal']} <br>
                 <strong>KDJ:</strong> {fila['KDJ Señal']} <br>
@@ -79,26 +80,20 @@ for i, fila in tabla.iterrows():
             <h3 style="margin-top:25px;">🔍 Indicadores adicionales</h3>
 
             <p>
-                <strong>RSI (14):</strong> {fila['RSI']} — 
-                {"🟢 Normal" if fila['RSI Estado']=="Normal"
-                    else "🔴 Sobrecompra" if fila['RSI Estado']=="Sobrecompra"
-                    else "🟡 Sobreventa"}
+                <strong>RSI (14):</strong> {fila['RSI']} — {fila['RSI Estado']}
             </p>
 
             <p>
-                <strong>Tendencia EMA50 / EMA200:</strong>
-                {"🟢 Alcista (EMA50 > EMA200)" if fila['Tendencia']=="Alcista"
-                    else "🔴 Bajista (EMA50 < EMA200)"}
+                <strong>Tendencia EMA50 / EMA200:</strong> {fila['Tendencia']}
             </p>
 
             <p>
-                <strong>Precio vs EMA50:</strong>
-                {"🟢 Precio arriba de EMA50" if fila['Precio EMA50']=="Arriba"
-                    else "🔴 Precio debajo de EMA50"}
+                <strong>Precio vs EMA50:</strong> {fila['Precio EMA50']}
             </p>
 
             <!-- RANGOS BOLLINGER -->
             <h3 style="margin-top:25px;">📏 Rangos Bollinger</h3>
+
             <p>
                 <strong>Banda Superior:</strong> {fila['Banda Superior']} <br>
                 <strong>Banda Inferior:</strong> {fila['Banda Inferior']}
@@ -106,6 +101,7 @@ for i, fila in tabla.iterrows():
 
             <!-- EXPLICACIÓN COMPLETA -->
             <h3 style="margin-top:25px;">📝 Explicación completa</h3>
+
             <p style="font-size:16px;">
                 {fila['Explicación']}
             </p>
