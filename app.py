@@ -34,12 +34,7 @@ st.subheader("📊 Análisis Individual por Acción — HTML REAL")
 
 for _, fila in tabla.iterrows():
 
-  if fila["MACD Señal"] == "MACD Alcista":
-    macd_icon = "🟢"
-    macd_text = "Alcista"
-else:
-    macd_icon = "🔴"
-    macd_text = "Bajista"
+ 
 
      
     html = f"""
@@ -72,6 +67,7 @@ else:
     """
 
     components.html(html, height=280)
+
 
 
 
