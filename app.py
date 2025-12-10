@@ -33,6 +33,9 @@ st.download_button(
 st.subheader("📊 Análisis Individual por Acción — HTML REAL")
 
 for _, fila in tabla.iterrows():
+
+    # Color del MACD
+    macd_color = "🟢" if fila["MACD Señal"] == "MACD Alcista" else "🔴"
      
     html = f"""
     <div style="
@@ -53,9 +56,18 @@ for _, fila in tabla.iterrows():
             💲 <strong>Precio actual:</strong> {fila['Precio']}
         </p>
 
+        <!-- MACD -->
+        <h3 style="margin-top:20px;">📉 MACD</h3>
+        <p style="font-size:17px;">
+            {macd_color} <strong>{fila['MACD Señal']}</strong><br>
+            <strong>MACD:</strong> {fila['MACD']}<br>
+            <strong>Signal:</strong> {fila['Signal']}
+        </p>
+
     </div>
     """
 
     components.html(html, height=200)
+
 
 
