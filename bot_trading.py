@@ -140,7 +140,7 @@ def analizar(ticker):
 # ============================================================
 acciones = [
     "HERDEZ.MX",
-    "TLEVISACPO.MX"
+    "TLEVISACPO.MX",
     "MEGACPO.MX",
     "VOLARA.MX",
     "AUTLANB.MX",
@@ -182,4 +182,5 @@ print("\n===================================================\n")
 # Guardar historial
 tabla.to_csv("historial_trading.csv", index=False)
 print("💾 Archivo guardado: historial_trading.csv\n")
+
 
