@@ -61,11 +61,13 @@ for _, fila in tabla.iterrows():
         <p style="font-size:17px;">
         {macd_color} <strong>{fila['MACD Señal']}</strong><br>
         <strong>MACD:</strong> {fila['MACD']}<br>
-
+        <strong>Signal:</strong> {fila['Signal']}
+        </p>
     </div>
     """
 
     components.html(html, height=200)
+
 
 
 
