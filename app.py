@@ -14,10 +14,11 @@ html, body, [data-testid="stAppViewContainer"] {
 </style>
 """, unsafe_allow_html=True)
 
+# Título principal
 st.title("📈 Bot de Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ")
 
-# Analizar todas las acciones
+# Analizar acciones
 resultados = []
 for acc in acciones:
     r = analizar(acc)
@@ -40,37 +41,44 @@ st.download_button(
 )
 
 # =============================
-# TARJETAS MODELO BLOOMBERG
+# TARJETAS INDIVIDUALES
 # =============================
 st.subheader("📊 Análisis Individual por Acción")
 
 for i, fila in tabla.iterrows():
-    st.markdown(
-        f"""
-        <div style="background:#FFF; padding:20px; border-radius:15px; 
-                    border:1px solid #e3e3e3; margin-bottom:20px;">
 
-            <h2>📌 {fila['Ticker']} — 
-                <span style="color:#0066cc;">{fila['Señal Final']}</span>
-            </h2>
+    html_card = f"""
+    <div style="
+        background:white;
+        padding:25px;
+        border-radius:15px;
+        border:1px solid #dcdcdc;
+        margin-bottom:25px;
+        box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+    ">
 
-            <p><strong>Precio:</strong> {fila['Precio']}</p>
+        <h2 style="margin:0; font-size:28px;">
+            📌 <strong>{fila['Ticker']}</strong> — 
+            <span style="color:#0066cc;">{fila['Señal Final']}</span>
+        </h2>
 
-            <h3>Indicadores</h3>
-            <p><strong>MACD:</strong> {fila['MACD Señal']}</p>
-            <p><strong>Bollinger:</strong> {fila['Bollinger Señal']}</p>
-            <p><strong>KDJ:</strong> {fila['KDJ Señal']}</p>
+        <p style="font-size:18px; margin-top:10px;">
+            <strong>Precio:</strong> {fila['Precio']}
+        </p>
 
-            <h3>Niveles</h3>
-            <p><strong>Banda Superior:</strong> {fila['Banda Superior']}</p>
-            <p><strong>Banda Inferior:</strong> {fila['Banda Inferior']}</p>
+        <h3>📘 Indicadores</h3>
+        <p><strong>MACD:</strong> {fila['MACD Señal']}</p>
+        <p><strong>Bollinger:</strong> {fila['Bollinger Señal']}</p>
+        <p><strong>KDJ:</strong> {fila['KDJ Señal']}</p>
 
-            <h3>Explicación</h3>
-            <p>{fila['Explicación']}</p>
+        <h3>📏 Niveles</h3>
+        <p><strong>Banda Superior:</strong> {fila['Banda Superior']}</p>
+        <p><strong>Banda Inferior:</strong> {fila['Banda Inferior']}</p>
 
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+        <h3>📝 Explicación</h3>
+        <p>{fila['Explicación']}</p>
 
+    </div>
+    """
 
+    st.markdown(html_card, unsafe_allow_html=True)
