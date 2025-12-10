@@ -56,7 +56,7 @@ for _, fila in tabla.iterrows():
             box-shadow:0px 2px 8px rgba(0,0,0,0.05);
         ">
 
-           
+            <!-- TITULO -->
             <h2 style="margin:0; font-size:28px;">
                 📌 <strong>{fila['Ticker']}</strong> —
                 <span style="color:#0066ff;">{fila['Señal Final']}</span>
