@@ -66,7 +66,8 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=200)
+    components.html(html, height=280)
+
 
 
 
