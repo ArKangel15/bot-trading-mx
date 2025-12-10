@@ -3,7 +3,7 @@ import pandas as pd
 from bot_trading import analizar, acciones
 
 # ================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN DE PÁGINA
 # ================================
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
@@ -14,7 +14,7 @@ st.title("📈 Bot de Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs")
 
 # ================================
-# ANALIZA TODAS LAS ACCIONES
+# ANALIZAR ACCIONES
 # ================================
 resultados = []
 for acc in acciones:
@@ -30,7 +30,6 @@ tabla = pd.DataFrame(resultados)
 st.subheader("📊 Resultados del Análisis Técnico")
 st.dataframe(tabla, use_container_width=True)
 
-# DESCARGA CSV
 st.download_button(
     label="📥 Descargar CSV",
     data=tabla.to_csv(index=False),
@@ -39,9 +38,9 @@ st.download_button(
 )
 
 # ================================
-# TARJETAS ESTILO BLOOMBERG — PRUEBA 2
+# TARJETAS — PRUEBA SOLO TÍTULO + PRECIO
 # ================================
-st.subheader("📊 Análisis Individual por Acción — PRUEBA 2")
+st.subheader("📊 Análisis Individual por Acción — PRUEBA")
 
 for _, fila in tabla.iterrows():
 
@@ -55,13 +54,11 @@ for _, fila in tabla.iterrows():
             border:1px solid #cccccc;
         ">
 
-            <!-- TITULO -->
             <h2 style="margin:0; font-size:26px;">
-                📌 <strong>{fila['Ticker']}</strong> — 
+                📌 <strong>{fila['Ticker']}</strong> —
                 <span style="color:#0066ff;">{fila['Señal Final']}</span>
             </h2>
 
-            <!-- PRECIO -->
             <p style="font-size:18px; margin-top:10px;">
                 💲 <strong>Precio actual:</strong> {fila['Precio']}
             </p>
