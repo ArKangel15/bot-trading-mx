@@ -56,12 +56,16 @@ for _, fila in tabla.iterrows():
             💲 <strong>Precio actual:</strong> {fila['Precio']}
         </p>
 
+        <!-- MACD -->
+        <h3 style="margin-top:20px;">📉 MACD</h3>
+        <p style="font-size:17px;">
 
 
     </div>
     """
 
     components.html(html, height=200)
+
 
 
 
