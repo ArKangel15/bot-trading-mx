@@ -34,6 +34,12 @@ st.subheader("📊 Análisis Individual por Acción — HTML REAL")
 
 for _, fila in tabla.iterrows():
 
+    # Determinar color para MACD
+    if fila["MACD Señal"] == "MACD Alcista":
+        macd_color = "🟢"
+    else:
+        macd_color = "🔴"
+        
     html = f"""
     <div style="
         background-color:#ffffff;
@@ -57,3 +63,4 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=200)
+
