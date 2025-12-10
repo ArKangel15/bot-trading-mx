@@ -5,8 +5,9 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime
 
+
 # ============================================================
-#                MACD MANUAL
+#                    MACD MANUAL
 # ============================================================
 def macd_manual(close):
     ema12 = close.ewm(span=12, adjust=False).mean()
@@ -19,7 +20,7 @@ def macd_manual(close):
 
 
 # ============================================================
-#             BOLLINGER BANDS MANUAL
+#               BOLLINGER BANDS MANUAL
 # ============================================================
 def bollinger_manual(close):
     mid = close.rolling(20).mean().iloc[-1]
@@ -32,7 +33,7 @@ def bollinger_manual(close):
 
 
 # ============================================================
-#                     KDJ MANUAL
+#                       KDJ MANUAL
 # ============================================================
 def kdj_manual(high, low, close):
     low_min = low.rolling(14).min().iloc[-1]
@@ -47,7 +48,31 @@ def kdj_manual(high, low, close):
 
 
 # ============================================================
-#                    ANALIZADOR PRINCIPAL
+#                       RSI (14)
+# ============================================================
+def rsi_manual(close, period=14):
+    delta = close.diff()
+    gain = delta.clip(lower=0).rolling(period).mean()
+    loss = -delta.clip(upper=0).rolling(period).mean()
+
+    RS = gain / loss
+    RSI = 100 - (100 / (1 + RS))
+
+    return float(RSI.iloc[-1])
+
+
+# ============================================================
+#                       EMAs
+# ============================================================
+def calcular_emas(close):
+    ema20 = float(close.ewm(span=20, adjust=False).mean().iloc[-1])
+    ema50 = float(close.ewm(span=50, adjust=False).mean().iloc[-1])
+    ema200 = float(close.ewm(span=200, adjust=False).mean().iloc[-1])
+    return ema20, ema50, ema200
+
+
+# ============================================================
+#                    ANALIZAR UNA ACCIÓN
 # ============================================================
 def analizar(ticker):
 
@@ -62,12 +87,14 @@ def analizar(ticker):
 
     precio = float(close.iloc[-1])
 
-    # Indicadores
+    # -------- INDICADORES --------
     macd, signal = macd_manual(close)
     upper, lower = bollinger_manual(close)
     K, D, J = kdj_manual(high, low, close)
+    rsi = rsi_manual(close)
+    ema20, ema50, ema200 = calcular_emas(close)
 
-    # ESTADOS
+    # -------- ESTADOS --------
     macd_estado = "Alcista" if macd > signal else "Bajista"
     kdj_estado = "Alcista" if K > D else "Bajista"
 
@@ -78,10 +105,20 @@ def analizar(ticker):
     else:
         bollinger_estado = "Normal"
 
-    # Señal final simplificada y estable
-    if macd > signal and precio < lower and K > D:
+    if rsi < 30:
+        rsi_estado = "Sobreventa"
+    elif rsi > 70:
+        rsi_estado = "Sobrecompra"
+    else:
+        rsi_estado = "Normal"
+
+    tendencia = "Alcista" if ema50 > ema200 else "Bajista"
+    precio_ema50 = "Arriba" if precio > ema50 else "Debajo"
+
+    # -------- SEÑAL FINAL --------
+    if macd > signal and rsi < 35 and precio < lower and tendencia == "Alcista":
         señal = "COMPRA FUERTE"
-    elif macd < signal and precio > upper and K < D:
+    elif macd < signal and rsi > 70 and precio > upper and tendencia == "Bajista":
         señal = "VENTA FUERTE"
     elif macd > signal or K > D:
         señal = "POSIBLE COMPRA"
@@ -90,6 +127,7 @@ def analizar(ticker):
     else:
         señal = "ESPERAR"
 
+    # -------- RESULTADO --------
     return {
         "Fecha": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "Ticker": ticker,
@@ -108,13 +146,31 @@ def analizar(ticker):
         "J": round(J, 2),
         "KDJ Señal": kdj_estado,
 
+        "RSI": round(rsi, 2),
+        "RSI Estado": rsi_estado,
+
+        "EMA20": round(ema20, 2),
+        "EMA50": round(ema50, 2),
+        "EMA200": round(ema200, 2),
+
+        "Tendencia": tendencia,
+        "Precio EMA50": precio_ema50,
+
         "Señal Final": señal,
-        "Explicación": f"MACD: {macd_estado} | Bollinger: {bollinger_estado} | KDJ: {kdj_estado}"
+
+        "Explicación": (
+            f"MACD: {macd_estado} | "
+            f"KDJ: {kdj_estado} | "
+            f"Bollinger: {bollinger_estado} | "
+            f"RSI: {rsi_estado} | "
+            f"Tendencia (EMA50/EMA200): {tendencia} | "
+            f"Precio vs EMA50: {precio_ema50}"
+        )
     }
 
 
 # ============================================================
-#                  LISTA DE ACCIONES MX
+#               LISTA DE ACCIONES DEL MERCADO MX
 # ============================================================
 acciones = [
     "HERDEZ.MX",
@@ -141,5 +197,3 @@ acciones = [
     "VESTA.MX",
     "BBAJIOO.MX"
 ]
-
-
