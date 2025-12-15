@@ -197,6 +197,10 @@ acciones = [
     "VESTA.MX",
     "BBAJIOO.MX",
     "ALPEKA.MX",
-    "AGUILASCPO.MX"
+    "AGUILASCPO.MX",
+    "GMEXICOB.MX",
+    "NEMAKA.MX",
+    "AXTELCPO.MX"
 ]
+
 
