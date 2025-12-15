@@ -30,7 +30,7 @@ st.download_button(
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
 # ==========================
-st.subheader("📊 Análisis Individual por Acción — HTML REAL")
+st.subheader("📊 Análisis Individual por Acción")
 
 for _, fila in tabla.iterrows():
     # Color del MACD (basado en números, no en texto)
@@ -38,16 +38,17 @@ for _, fila in tabla.iterrows():
     signal_val = float(fila["Signal"])
     macd_color = "🟢" if macd_val > signal_val else "🔴"
 
-    # RSI semáforo por acción
-if fila["RSI"] < 30:
-    rsi_estado = "Sobreventa"
-    rsi_color = "🟢"   # Comprar
-elif fila["RSI"] <= 70:
-    rsi_estado = "Normal"
-    rsi_color = "🟡"   # Esperar
-else:
-    rsi_estado = "Sobrecompra"
-    rsi_color = "🔴"   # Vender
+   # RSI semáforo por acción (🟢 comprar | 🟡 esperar | 🔴 vender)
+    rsi_val = float(fila["RSI"])
+    if rsi_val < 30:
+        rsi_estado = "Sobreventa"
+        rsi_color = "🟢"   # Comprar
+    elif rsi_val <= 70:
+        rsi_estado = "Normal"
+        rsi_color = "🟡"   # Esperar
+    else:
+        rsi_estado = "Sobrecompra"
+        rsi_color = "🔴"   # Vender
 
     html = f"""
     <div style="
@@ -78,7 +79,7 @@ else:
         <h3 style="margin-top:20px;">📊 RSI (14)</h3>
         <p style="font-size:17px;">
         {rsi_color} <strong>{rsi_estado}</strong><br>
-        RSI: {fila['RSI']}<br>
+         RSI: {rsi_val:.2f}<br>
         Rangos: Sobreventa &lt; 30 | Normal 30–70 | Sobrecompra &gt; 70
         </p>
         
@@ -86,6 +87,7 @@ else:
     """
 
     components.html(html, height=450)
+
 
 
 
