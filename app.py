@@ -77,19 +77,16 @@ else:
 
         <h3 style="margin-top:20px;">📊 RSI (14)</h3>
         <p style="font-size:17px;">
-        <p>
         {rsi_color} <strong>{rsi_estado}</strong><br>
         RSI: {fila['RSI']}<br>
         Rangos: Sobreventa &lt; 30 | Normal 30–70 | Sobrecompra &gt; 70
         </p>
-
-        </p>
-
         
     </div>
     """
 
     components.html(html, height=450)
+
 
 
 
