@@ -50,6 +50,17 @@ for _, fila in tabla.iterrows():
         rsi_estado = "Sobrecompra"
         rsi_color = "🔴"   # Vender
 
+        # ===== Semáforo EMAs =====
+    tendencia = str(fila["Tendencia"])          # "Alcista" o "Bajista"
+    precio_ema50 = str(fila["Precio EMA50"])    # "Arriba" o "Debajo"
+
+    ema_trend_color = "🟢" if tendencia == "Alcista" else "🔴"
+    precio_ema50_color = "🟢" if precio_ema50 == "Arriba" else "🔴"
+
+    ema50_val = float(fila["EMA50"])
+    ema200_val = float(fila["EMA200"])
+
+
     html = f"""
     <div style="
         background-color:#ffffff;
@@ -82,11 +93,25 @@ for _, fila in tabla.iterrows():
          RSI: {rsi_val:.2f}<br>
         Rangos: Sobreventa &lt; 30 | Normal 30–70 | Sobrecompra &gt; 70
         </p>
+
+        <h3 style="margin-top:20px;">📈 Tendencia (EMAs)</h3>
+        <p style="font-size:17px;">
+            {ema_trend_color} <strong>EMA50 vs EMA200:</strong> {tendencia}<br>
+            <strong>EMA50:</strong> {ema50_val:.2f}<br>
+            <strong>EMA200:</strong> {ema200_val:.2f}
+        </p>
+
+        <h3 style="margin-top:15px;">⏱️ Reacción (Precio vs EMA50)</h3>
+        <p style="font-size:17px;">
+            {precio_ema50_color} <strong>Precio vs EMA50:</strong> {precio_ema50}
+        </p>
+
         
     </div>
     """
 
-    components.html(html, height=450)
+    components.html(html, height=580)
+
 
 
 
