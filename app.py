@@ -84,6 +84,87 @@ for _, fila in tabla.iterrows():
         kdj_estado = "Bajista"
         kdj_color = "🔴"   # Vender
 
+    # ==========================
+    # SEMÁFORO FINAL (SCORING)
+    # ==========================
+    score = 0
+    razones = []
+
+    # --- MACD ---
+    macd_val = float(fila["MACD"])
+    signal_val = float(fila["Signal"])
+    if macd_val > signal_val:
+        score += 1
+        razones.append("MACD alcista")
+    else:
+        score -= 1
+        razones.append("MACD bajista")
+
+    # --- RSI ---
+    rsi_val = float(fila["RSI"])
+    if rsi_val < 30:
+        score += 1
+        razones.append("RSI sobreventa (<30)")
+    elif rsi_val > 70:
+        score -= 1
+        razones.append("RSI sobrecompra (>70)")
+    else:
+        razones.append("RSI normal (30–70)")
+
+    # --- Bollinger ---
+    boll_estado = str(fila["Bollinger Señal"])
+    if boll_estado == "Sobreventa":
+        score += 1
+        razones.append("Bollinger sobreventa")
+    elif boll_estado == "Sobrecompra":
+        score -= 1
+        razones.append("Bollinger sobrecompra")
+    else:
+        razones.append("Bollinger normal")
+
+    # --- Tendencia (EMA50 vs EMA200) ---
+    tendencia = str(fila["Tendencia"])
+    if tendencia == "Alcista":
+        score += 1
+        razones.append("Tendencia alcista (EMA50>EMA200)")
+    else:
+        score -= 1
+        razones.append("Tendencia bajista (EMA50<EMA200)")
+
+    # --- Precio vs EMA50 (timing) ---
+    precio_ema50 = str(fila["Precio EMA50"])
+    if precio_ema50 == "Arriba":
+        score += 1
+        razones.append("Precio arriba EMA50")
+    else:
+        score -= 1
+        razones.append("Precio debajo EMA50")
+
+    # --- KDJ ---
+    K_val = float(fila["K"])
+    D_val = float(fila["D"])
+    if K_val > D_val:
+        score += 1
+        razones.append("KDJ alcista (K>D)")
+    else:
+        score -= 1
+        razones.append("KDJ bajista (K<D)")
+
+    # --- Interpretación del score ---
+    if score >= 4:
+        semaforo_final = "🟢 COMPRA FUERTE"
+    elif score >= 2:
+        semaforo_final = "🟢 POSIBLE COMPRA"
+    elif score <= -4:
+        semaforo_final = "🔴 VENTA FUERTE"
+    elif score <= -2:
+        semaforo_final = "🔴 POSIBLE VENTA"
+    else:
+        semaforo_final = "🟡 ESPERAR"
+
+    # Explicación corta (top 4 razones)
+    explicacion_score = " | ".join(razones[:4]) + (" | ..." if len(razones) > 4 else "")
+
     
     html = f"""
     <div style="
@@ -103,6 +184,14 @@ for _, fila in tabla.iterrows():
         <p style="font-size:18px; margin-top:10px;">
             💲 <strong>Precio actual:</strong> {fila['Precio']}
         </p>
+
+        <h3 style="margin-top:20px;">🚦 Semáforo Final (Score)</h3>
+        <p style="font-size:17px;">
+            <strong>{semaforo_final}</strong><br>
+            <strong>Score:</strong> {score} / 6<br>
+            <small>{explicacion_score}</small>
+        </p>
+
 
         <h3 style="margin-top:20px;">📉 MACD</h3>
         <p style="font-size:17px;">
@@ -161,6 +250,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=950)
+
 
 
 
