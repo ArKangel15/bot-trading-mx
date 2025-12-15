@@ -60,7 +60,17 @@ for _, fila in tabla.iterrows():
     ema50_val = float(fila["EMA50"])
     ema200_val = float(fila["EMA200"])
 
+    # ===== Semáforo Bollinger (acción) =====
+    boll_estado = str(fila["Bollinger Señal"])  # "Sobreventa", "Normal", "Sobrecompra"
 
+    if boll_estado == "Sobreventa":
+        boll_color = "🟢"   # Comprar
+    elif boll_estado == "Normal":
+        boll_color = "🟡"   # Esperar
+    else:  # "Sobrecompra"
+        boll_color = "🔴"   # Vender
+
+    
     html = f"""
     <div style="
         background-color:#ffffff;
@@ -94,6 +104,18 @@ for _, fila in tabla.iterrows():
         Rangos: Sobreventa &lt; 30 | Normal 30–70 | Sobrecompra &gt; 70
         </p>
 
+        <h3 style="margin-top:20px;">📉 Bollinger (Volatilidad)</h3>
+        <p style="font-size:17px;">
+            {boll_color} <strong>Estado:</strong> {boll_estado}<br>
+            <strong>Banda Superior:</strong> {fila['Banda Superior']}<br>
+            <strong>Banda Inferior:</strong> {fila['Banda Inferior']}<br>
+            <small>
+                Interpretación: 🟢 precio bajo banda inferior (zona compra) |
+                🟡 dentro del canal (esperar) |
+                🔴 sobre banda superior (zona venta)
+            </small>
+        </p>
+    
         <h3 style="margin-top:20px;">📈 Tendencia (EMAs)</h3>
         <p style="font-size:17px;">
             {ema_trend_color} <strong>EMA50 vs EMA200:</strong> {tendencia}<br>
@@ -111,6 +133,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=650)
+
 
 
 
