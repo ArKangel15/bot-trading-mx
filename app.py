@@ -168,13 +168,18 @@ for _, fila in tabla.iterrows():
     
     html = f"""
     <div style="
-        background-color:#ffffff;
-        padding:25px;
-        border-radius:20px;
-        margin-bottom:25px;
-        border:1px solid #cccccc;
-        font-family:Arial;
-    ">
+    background-color:#ffffff;
+    padding:25px;
+    border-radius:20px;
+    margin-bottom:25px;
+    border:1px solid #cccccc;
+    font-family:Arial;
+
+    max-height: 820px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+">
+
 
         <h2 style="margin:0; font-size:26px;">
             📌 <strong>{fila['Ticker']}</strong> —
@@ -249,4 +254,6 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=1150)
+    components.html(html, height=880, scrolling=True)
+
+
