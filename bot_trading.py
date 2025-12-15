@@ -76,7 +76,7 @@ def calcular_emas(close):
 # ============================================================
 def analizar(ticker):
 
-    data = yf.download(ticker, period="6mo", interval="1d")
+    data = yf.download(ticker, period="2y", interval="1d")
 
     if data.empty:
         return None
@@ -202,5 +202,6 @@ acciones = [
     "NEMAKA.MX",
     "AXTELCPO.MX"
 ]
+
 
 
