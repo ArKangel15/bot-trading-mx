@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
 from bot_trading import analizar, acciones
 
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
@@ -254,6 +253,8 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=880, scrolling=True)
+st.markdown(html, unsafe_allow_html=True)
+
+
 
 
