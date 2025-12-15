@@ -195,5 +195,8 @@ acciones = [
     "CHDRAUIB.MX",
     "GCARSOA1.MX",
     "VESTA.MX",
-    "BBAJIOO.MX"
+    "BBAJIOO.MX",
+    "ALPEKA.MX",
+    "AGUILASCPO.MX"
 ]
+
