@@ -80,10 +80,7 @@ def analizar(ticker):
 
     if data.empty:
         return None
-    if len(data) < 210:
-    return None
-
-
+ 
     close = data["Close"]
     high = data["High"]
     low = data["Low"]
@@ -205,6 +202,7 @@ acciones = [
     "NEMAKA.MX",
     "AXTELCPO.MX"
 ]
+
 
 
 
