@@ -38,6 +38,12 @@ for _, fila in tabla.iterrows():
     signal_val = float(fila["Signal"])
     macd_color = "🟢" if macd_val > signal_val else "🔴"
 
+    rsi_val = float(fila["RSI"])
+    rsi_estado = str(fila["RSI Estado"])
+    # Semáforo RSI
+    rsi_color = "🟢" if rsi_estado == "Normal" else ("🔴" if rsi_estado == "Sobrecompra" else "🟡")
+
+
     html = f"""
     <div style="
         background-color:#ffffff;
@@ -63,7 +69,17 @@ for _, fila in tabla.iterrows():
         <strong>MACD:</strong> {fila['MACD']}<br>
         <strong>Signal:</strong> {fila['Signal']}
         </p>
+
+        <h3 style="margin-top:20px;">📊 RSI (14)</h3>
+        <p style="font-size:17px;">
+        {rsi_color} <strong>{rsi_estado}</strong><br>
+        <strong>RSI:</strong> {rsi_val:.2f}<br>
+        <small>Rangos: <b>Sobreventa</b> &lt; 30 | <b>Normal</b> 30–70 | <b>Sobrecompra</b> &gt; 70</small>
+        </p>
+
+        
     </div>
     """
 
-    components.html(html, height=280)
+    components.html(html, height=360)
+
