@@ -70,6 +70,20 @@ for _, fila in tabla.iterrows():
     else:  # "Sobrecompra"
         boll_color = "🔴"   # Vender
 
+        # ===== Semáforo KDJ =====
+    K_val = float(fila["K"])
+    D_val = float(fila["D"])
+
+    if K_val > D_val:
+        kdj_estado = "Alcista"
+        kdj_color = "🟢"   # Comprar
+    elif abs(K_val - D_val) < 1:
+        kdj_estado = "Neutral"
+        kdj_color = "🟡"   # Esperar
+    else:
+        kdj_estado = "Bajista"
+        kdj_color = "🔴"   # Vender
+
     
     html = f"""
     <div style="
@@ -115,6 +129,20 @@ for _, fila in tabla.iterrows():
                 🔴 sobre banda superior (zona venta)
             </small>
         </p>
+
+        <h3 style="margin-top:20px;">📊 KDJ (Momentum)</h3>
+        <p style="font-size:17px;">
+            {kdj_color} <strong>{kdj_estado}</strong><br>
+            <strong>K:</strong> {fila['K']}<br>
+            <strong>D:</strong> {fila['D']}<br>
+            <strong>J:</strong> {fila['J']}<br>
+            <small>
+                Interpretación: 🟢 K&gt;D (impulso alcista) |
+                🟡 K≈D (sin dirección) |
+                🔴 K&lt;D (impulso bajista)
+            </small>
+        </p>
+
     
         <h3 style="margin-top:20px;">📈 Tendencia (EMAs)</h3>
         <p style="font-size:17px;">
@@ -133,6 +161,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=850)
+
 
 
 
