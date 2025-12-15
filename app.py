@@ -249,25 +249,4 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=1250)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    components.html(html, height=1150)
