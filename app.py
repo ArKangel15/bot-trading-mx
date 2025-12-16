@@ -101,7 +101,7 @@ for _, fila in tabla.iterrows():
             {fila["Ticker"]}
         </a>
         &nbsp; — &nbsp;
-        <span style="font-weight:800;">{fila["Señal Final"]}</span>
+        <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
         &nbsp; | &nbsp;
         <span style="color:#666;">Score: {fila.get("Score", "–")}/6</span>
     </div>
@@ -352,6 +352,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
