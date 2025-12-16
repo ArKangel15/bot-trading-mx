@@ -74,37 +74,6 @@ for i in range(len(tabla)):
     tabla.at[i, "Semáforo Final"] = sem
 
 
-st.subheader("📊 Resultados del Análisis Técnico")
-st.dataframe(tabla, use_container_width=True)
-
-st.download_button(
-    label="📥 Descargar CSV",
-    data=tabla.to_csv(index=False),
-    file_name="resultados_trading.csv",
-    mime="text/csv"
-)
-
-st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
-
-items = []
-for _, fila in tabla.iterrows():
-    anchor_id = str(fila["Ticker"]).replace(".", "-")
-    items.append(
-        f"""
-        <div style="padding:6px 0; border-bottom:1px solid #eee;">
-          🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800;">
-            {fila["Ticker"]}
-          </a>
-          &nbsp; — &nbsp;
-          <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
-          &nbsp; | &nbsp;
-          <span style="color:#666;">Score: {fila["Score"]}/6</span>
-        </div>
-        """
-    )
-
-st.markdown("<div>" + "".join(items) + "</div>", unsafe_allow_html=True)
-
 
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
@@ -334,6 +303,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
