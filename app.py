@@ -65,6 +65,13 @@ def calcular_score_y_semaforo(row):
         sem = "🟡 ESPERAR"
 
     return score, sem
+tabla["Score"] = ""
+tabla["Semáforo Final"] = ""
+
+for i in range(len(tabla)):
+    sc, sem = calcular_score_y_semaforo(tabla.iloc[i])
+    tabla.at[i, "Score"] = sc
+    tabla.at[i, "Semáforo Final"] = sem
 
 
 st.subheader("📊 Resultados del Análisis Técnico")
@@ -307,5 +314,6 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
