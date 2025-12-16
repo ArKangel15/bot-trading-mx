@@ -363,7 +363,8 @@ for _, fila in tabla.iterrows():
 
  #   components.html(html, height=880, scrolling=True)
  #    components.html(html, height=880)
-    components.html(html, height=880)
+    components.html(html, height=980)
+
 
 
 
