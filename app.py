@@ -119,7 +119,9 @@ resumen_html = f"""
 </div>
 """
 
-components.html(resumen_html, height=600, scrolling=True)
+#components.html(resumen_html, height=600, scrolling=True)
+st.markdown(resumen_html, unsafe_allow_html=True)
+
 
 
 
@@ -130,6 +132,12 @@ components.html(resumen_html, height=600, scrolling=True)
 st.subheader("📊 Análisis Individual por Acción")
 
 for _, fila in tabla.iterrows():
+#Agregue este 
+        anchor_id = str(fila["Ticker"]).replace(".", "-")
+    st.markdown(
+        f'<div id="{anchor_id}" style="position:relative; top:-80px;"></div>',
+        unsafe_allow_html=True
+    )
 
    
     # Color del MACD (basado en números, no en texto)
@@ -354,7 +362,10 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=880, scrolling=True)
+ #   components.html(html, height=880, scrolling=True)
+     components.html(html, height=980)
+
+
 
 
 
