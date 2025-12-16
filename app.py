@@ -65,6 +65,7 @@ def calcular_score_y_semaforo(row):
         sem = "🟡 ESPERAR"
 
     return score, sem
+    
 tabla["Score"] = ""
 tabla["Semáforo Final"] = ""
 
@@ -314,5 +315,6 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
