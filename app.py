@@ -130,6 +130,10 @@ components.html(resumen_html, height=600, scrolling=True)
 st.subheader("📊 Análisis Individual por Acción")
 
 for _, fila in tabla.iterrows():
+
+    # ✅ ID único para que el link del "Resumen rápido" baje a esta tarjeta
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
+
     # Color del MACD (basado en números, no en texto)
     macd_val = float(fila["MACD"])
     signal_val = float(fila["Signal"])
@@ -264,6 +268,7 @@ for _, fila in tabla.iterrows():
 
     
     html = f"""
+    <a id="{anchor_id}"></a>
     <div style="
     background-color:#ffffff;
     padding:25px;
@@ -352,13 +357,5 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
-
-
-
-
-
-
-
-
 
 
