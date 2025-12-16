@@ -17,6 +17,56 @@ for acc in acciones:
 
 tabla = pd.DataFrame(resultados)
 
+def calcular_score_y_semaforo(row):
+    score = 0
+
+    # MACD
+    macd_val = float(row["MACD"])
+    signal_val = float(row["Signal"])
+    score += 1 if macd_val > signal_val else -1
+
+    # RSI
+    rsi_val = float(row["RSI"])
+    if rsi_val < 30:
+        score += 1
+    elif rsi_val > 70:
+        score -= 1
+
+    # Bollinger
+    boll = str(row["Bollinger Señal"])
+    if boll == "Sobreventa":
+        score += 1
+    elif boll == "Sobrecompra":
+        score -= 1
+
+    # Tendencia (EMA50 vs EMA200)
+    tendencia = str(row["Tendencia"])
+    score += 1 if tendencia == "Alcista" else -1
+
+    # Precio vs EMA50
+    precio_ema50 = str(row["Precio EMA50"])
+    score += 1 if precio_ema50 == "Arriba" else -1
+
+    # KDJ
+    K_val = float(row["K"])
+    D_val = float(row["D"])
+    score += 1 if K_val > D_val else -1
+
+    # Semáforo final por score
+    if score >= 4:
+        sem = "🟢 COMPRA FUERTE"
+    elif score >= 2:
+        sem = "🟢 POSIBLE COMPRA"
+    elif score <= -4:
+        sem = "🔴 VENTA FUERTE"
+    elif score <= -2:
+        sem = "🔴 POSIBLE VENTA"
+    else:
+        sem = "🟡 ESPERAR"
+
+    return score, sem
+
+
 st.subheader("📊 Resultados del Análisis Técnico")
 st.dataframe(tabla, use_container_width=True)
 
@@ -26,6 +76,8 @@ st.download_button(
     file_name="resultados_trading.csv",
     mime="text/csv"
 )
+
+
 
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
@@ -255,4 +307,5 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
