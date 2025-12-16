@@ -119,7 +119,7 @@ resumen_html = f"""
 </div>
 """
 
-components.html(resumen_html, height=600)
+components.html(resumen_html, height=600, scrolling=True)
 
 
 
@@ -352,6 +352,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
