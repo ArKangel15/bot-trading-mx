@@ -118,8 +118,8 @@ resumen_html = f"""<a id="{anchor_id}"></a><div style="
 </div>
 """
 
-# components.html(resumen_html, height=600, scrolling=True)
-st.markdown(resumen_html, unsafe_allow_html=True)
+components.html(resumen_html, height=600, scrolling=True)
+#st.markdown(resumen_html, unsafe_allow_html=True)
 
 
 
@@ -363,6 +363,7 @@ for _, fila in tabla.iterrows():
  #   components.html(html, height=880, scrolling=True)
  #    components.html(html, height=880)
     components.html(html, height=1080)
+
 
 
 
