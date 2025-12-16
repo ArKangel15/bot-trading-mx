@@ -202,8 +202,13 @@ acciones = [
     "NEMAKA.MX",
     "AXTELCPO.MX",
     "CEMEXCPO.MX",
-    "GENTERA.MX"
+    "GENTERA.MX",
+    "WALMEX.MX",
+    "FEMSAUBD.MX",
+    "PEP.MX",
+    "COST.MX"
 ]
+
 
 
 
