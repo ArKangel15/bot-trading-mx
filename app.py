@@ -74,10 +74,6 @@ for i in range(len(tabla)):
     tabla.at[i, "Score"] = sc
     tabla.at[i, "Semáforo Final"] = sem
 
-
-
-
-
 st.subheader("📊 Resultados del Análisis Técnico")
 st.dataframe(tabla, use_container_width=True)
 
@@ -318,6 +314,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
