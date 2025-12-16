@@ -200,8 +200,11 @@ acciones = [
     "AGUILASCPO.MX",
     "GMEXICOB.MX",
     "NEMAKA.MX",
-    "AXTELCPO.MX"
+    "AXTELCPO.MX",
+    "CEMEXCPO.MX",
+    "GENTERA.MX"
 ]
+
 
 
 
