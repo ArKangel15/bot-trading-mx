@@ -275,9 +275,9 @@ for _, fila in tabla.iterrows():
     border:1px solid #cccccc;
     font-family:Arial;
 
-    max-height: 820px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+#    max-height: 820px;
+#    overflow-y: auto;
+#    -webkit-overflow-scrolling: touch;
 ">
 
 
@@ -355,6 +355,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
