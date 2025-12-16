@@ -108,6 +108,7 @@ for _, fila in tabla.iterrows():
     """)
 
 resumen_html = f"""
+<a id="{anchor_id}"></a>
 <div style="
     background:#ffffff;
     padding:16px;
@@ -364,6 +365,7 @@ for _, fila in tabla.iterrows():
  #   components.html(html, height=880, scrolling=True)
  #    components.html(html, height=880)
     components.html(html, height=1080)
+
 
 
 
