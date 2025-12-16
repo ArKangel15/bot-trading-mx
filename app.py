@@ -84,6 +84,44 @@ st.download_button(
     mime="text/csv"
 )
 
+import streamlit.components.v1 as components
+# ==========================
+# RESUMEN RÁPIDO SUPERIOR
+# ==========================
+st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
+
+items = []
+
+for _, fila in tabla.iterrows():
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
+
+    items.append(f"""
+    <div style="padding:8px 0; border-bottom:1px solid #eee;">
+        🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
+            {fila["Ticker"]}
+        </a>
+        &nbsp; — &nbsp;
+        <span style="font-weight:800;">{fila["Señal Final"]}</span>
+        &nbsp; | &nbsp;
+        <span style="color:#666;">Score: {fila.get("Score", "–")}/6</span>
+    </div>
+    """)
+
+resumen_html = f"""
+<div style="
+    background:#ffffff;
+    padding:16px;
+    border-radius:16px;
+    border:1px solid #dcdcdc;
+    font-family:Arial;
+">
+    {''.join(items)}
+</div>
+"""
+
+components.html(resumen_html, height=600)
+
+
 
 
 # ==========================
@@ -314,6 +352,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
+
 
 
 
