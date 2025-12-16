@@ -85,7 +85,8 @@ def analizar(ticker):
     high = data["High"]
     low = data["Low"]
 
-    precio = float(close.iloc[-1])
+    # precio = float(close.iloc[-1])
+    precio = float(close.iloc[-1].item())
 
     # -------- INDICADORES --------
     macd, signal = macd_manual(close)
@@ -208,6 +209,7 @@ acciones = [
     "PEP.MX",
     "COST.MX"
 ]
+
 
 
 
