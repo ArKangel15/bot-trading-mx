@@ -124,16 +124,15 @@ st.markdown(resumen_html, unsafe_allow_html=True)
 
 
 
-
-
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
 # ==========================
 st.subheader("📊 Análisis Individual por Acción")
 
-for _, fila in tabla.iterrows():
+# for _, fila in tabla.iterrows():
 #Agregue este 
-        anchor_id = str(fila["Ticker"]).replace(".", "-")
+for _, fila in tabla.iterrows():
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
     st.markdown(
         f'<div id="{anchor_id}" style="position:relative; top:-80px;"></div>',
         unsafe_allow_html=True
@@ -364,6 +363,7 @@ for _, fila in tabla.iterrows():
 
  #   components.html(html, height=880, scrolling=True)
      components.html(html, height=980)
+
 
 
 
