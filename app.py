@@ -74,6 +74,17 @@ for i in range(len(tabla)):
     tabla.at[i, "Semáforo Final"] = sem
 
 
+st.subheader("📊 Resultados del Análisis Técnico")
+st.dataframe(tabla, use_container_width=True)
+
+st.download_button(
+    label="📥 Descargar CSV",
+    data=tabla.to_csv(index=False),
+    file_name="resultados_trading.csv",
+    mime="text/csv"
+)
+
+
 
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
@@ -303,8 +314,5 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=880, scrolling=True)
-
-
-
 
 
