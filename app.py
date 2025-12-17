@@ -91,11 +91,7 @@ import streamlit.components.v1 as components
 import textwrap
 
 # ... tu código arriba ...
-st.markdown(
-    '<div id="resumen"></div>',
-    unsafe_allow_html=True
-)
-
+st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
 st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
 
 items = []
@@ -362,14 +358,14 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=1080)
-    components.html(
-    """
+    # ✅ BOTÓN FLOTANTE (UNA SOLA VEZ, FUERA DEL FOR)
+    st.markdown("""
     <style>
     #scrollTopBtn {
         position: fixed;
         bottom: 190px;
         right: 20px;
-        z-index: 9999;
+        z-index: 99999;
         background-color: #0066ff;
         color: white;
         border: none;
@@ -380,19 +376,11 @@ for _, fila in tabla.iterrows():
         cursor: pointer;
         box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
-
-    #scrollTopBtn:hover {
-        background-color: #004dcc;
-    }
+    #scrollTopBtn:hover { background-color: #004dcc; }
     </style>
-
-    <button id="scrollTopBtn" onclick="document.getElementById('resumen').scrollIntoView({behavior: 'smooth'});">
-        ⬆
+    
+    <button id="scrollTopBtn"
+    onclick="document.getElementById('resumen').scrollIntoView({behavior: 'smooth'});">
+    ⬆
     </button>
-    """,
-    height=0
-)
-
-
-
-
+    """, unsafe_allow_html=True)
