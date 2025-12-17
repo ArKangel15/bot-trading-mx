@@ -7,6 +7,43 @@ st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
 st.title("📈 Bot de Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs")
+# RESUMEN RÁPIDO SUPERIOR
+# ==========================
+import textwrap
+
+# ... tu código arriba ...
+st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
+st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
+
+items = []
+for _, fila in tabla.iterrows():
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
+   
+    item_html = textwrap.dedent(f"""
+<div style="padding:8px 0; border-bottom:1px solid #eee;">
+  🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
+    {fila["Ticker"]}
+  </a>
+  &nbsp; — &nbsp;
+  <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
+  &nbsp; | &nbsp;
+  <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
+</div>
+""").strip()
+
+    items.append(item_html)
+
+resumen_html = textwrap.dedent(f"""
+<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
+  {''.join(items)}
+</div>
+""").strip()
+
+st.markdown(resumen_html, unsafe_allow_html=True)
+
+
+
+
 
 # Analizar acciones
 resultados = []
@@ -86,39 +123,6 @@ st.download_button(
 
 import streamlit.components.v1 as components
 # ==========================
-# RESUMEN RÁPIDO SUPERIOR
-# ==========================
-import textwrap
-
-# ... tu código arriba ...
-st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
-st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
-
-items = []
-for _, fila in tabla.iterrows():
-    anchor_id = str(fila["Ticker"]).replace(".", "-")
-   
-    item_html = textwrap.dedent(f"""
-<div style="padding:8px 0; border-bottom:1px solid #eee;">
-  🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
-    {fila["Ticker"]}
-  </a>
-  &nbsp; — &nbsp;
-  <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
-  &nbsp; | &nbsp;
-  <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
-</div>
-""").strip()
-
-    items.append(item_html)
-
-resumen_html = textwrap.dedent(f"""
-<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
-  {''.join(items)}
-</div>
-""").strip()
-
-st.markdown(resumen_html, unsafe_allow_html=True)
 
 
 
@@ -387,5 +391,6 @@ for _, fila in tabla.iterrows():
     ⬆
     </button>
     """, unsafe_allow_html=True)
+
 
 
