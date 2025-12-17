@@ -105,7 +105,6 @@ resumen_html = f"""
   {''.join(items)}
 </div>
 """
-st.markdown(resumen_html, unsafe_allow_html=True)
 
 #
 
@@ -158,13 +157,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 #
 
+components.html(resumen_html, height=600, scrolling=True)
 
 
 
 
 
 
-st.markdown(resumen_html, unsafe_allow_html=True)
 
 # ==========================
 # CREA LA TABLA PARA DESCARGAR
@@ -475,6 +474,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
