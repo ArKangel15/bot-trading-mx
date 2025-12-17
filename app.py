@@ -363,7 +363,7 @@ for _, fila in tabla.iterrows():
     <style>
     #scrollTopBtn {
         position: fixed;
-        bottom: 190px;
+        bottom: 90px;
         right: 20px;
         z-index: 99999;
         background-color: #0066ff;
@@ -384,3 +384,4 @@ for _, fila in tabla.iterrows():
     ⬆
     </button>
     """, unsafe_allow_html=True)
+
