@@ -97,7 +97,8 @@ st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
 items = []
 for _, fila in tabla.iterrows():
     anchor_id = str(fila["Ticker"]).replace(".", "-")
-    items.append(f"""
+   
+    item_html = textwrap.dedent(f"""
 <div style="padding:8px 0; border-bottom:1px solid #eee;">
   🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
     {fila["Ticker"]}
@@ -107,7 +108,9 @@ for _, fila in tabla.iterrows():
   &nbsp; | &nbsp;
   <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
 </div>
-""")
+""").strip()
+
+    items.append(item_html)
 
 resumen_html = textwrap.dedent(f"""
 <div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
@@ -384,4 +387,5 @@ for _, fila in tabla.iterrows():
     ⬆
     </button>
     """, unsafe_allow_html=True)
+
 
