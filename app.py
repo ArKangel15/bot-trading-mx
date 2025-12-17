@@ -8,9 +8,6 @@ st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 st.title("📈 Bot de Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs")
 
-
-
-
 # Analizar acciones
 resultados = []
 for acc in acciones:
@@ -72,7 +69,10 @@ def calcular_score_y_semaforo(row):
 tabla["Score"] = ""
 tabla["Semáforo Final"] = ""
 
-
+for i in range(len(tabla)):
+    sc, sem = calcular_score_y_semaforo(tabla.iloc[i])
+    tabla.at[i, "Score"] = sc
+    tabla.at[i, "Semáforo Final"] = sem
 
 #
 # RESUMEN RÁPIDO SUPERIOR
@@ -123,10 +123,7 @@ st.markdown(resumen_html, unsafe_allow_html=True)
 
 
 
-for i in range(len(tabla)):
-    sc, sem = calcular_score_y_semaforo(tabla.iloc[i])
-    tabla.at[i, "Score"] = sc
-    tabla.at[i, "Semáforo Final"] = sem
+
 
 st.subheader("📊 Resultados del Análisis Técnico")
 st.dataframe(tabla, use_container_width=True)
@@ -408,6 +405,7 @@ for _, fila in tabla.iterrows():
     ⬆
     </button>
     """, unsafe_allow_html=True)
+
 
 
 
