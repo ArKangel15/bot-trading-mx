@@ -99,9 +99,7 @@ for _, fila in tabla.iterrows():
   </a> 
   
  
- # 🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
- #   {fila["Ticker"]}
- #</a>
+
   &nbsp; — &nbsp;
   <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
   &nbsp; | &nbsp;
@@ -455,4 +453,5 @@ components.html(
 """,
 height=0,
 )
+
 
