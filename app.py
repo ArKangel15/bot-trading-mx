@@ -363,7 +363,7 @@ for _, fila in tabla.iterrows():
     """
 
     components.html(html, height=1080)
-   components.html(
+components.html(
 """
 <script>
 (function () {
@@ -419,3 +419,4 @@ for _, fila in tabla.iterrows():
 """,
 height=0,
 )
+
