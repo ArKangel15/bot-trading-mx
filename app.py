@@ -105,7 +105,7 @@ resumen_html = f"""
   {''.join(items)}
 </div>
 """
-
+st.markdown(resumen_html, unsafe_allow_html=True)
 
 #
 
@@ -475,6 +475,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
