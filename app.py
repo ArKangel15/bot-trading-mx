@@ -108,6 +108,64 @@ resumen_html = textwrap.dedent(f"""
 </div>
 """).strip()
 
+
+#
+
+st.markdown("""
+<style>
+/* Contenedor del resumen */
+.resumen-box{
+  padding:16px;
+  border-radius:16px;
+  border:1px solid #dcdcdc;
+  font-family:Arial;
+  background:#ffffff;
+  color:#111111;
+}
+
+/* Cada renglón */
+.resumen-item{
+  padding:8px 0;
+  border-bottom:1px solid #eee;
+}
+
+/* Link ticker */
+.resumen-link{
+  text-decoration:none;
+  font-weight:800;
+  color:#0066ff;
+}
+
+/* Texto secundario */
+.resumen-muted{ color:#666; }
+
+/* --- MODO OSCURO --- */
+@media (prefers-color-scheme: dark) {
+  .resumen-box{
+    background:#0f1116 !important;
+    border:1px solid #2a2f3a !important;
+    color:#e8e8e8 !important;
+  }
+  .resumen-item{
+    border-bottom:1px solid #2a2f3a !important;
+  }
+  .resumen-link{
+    color:#7ab7ff !important;
+  }
+  .resumen-muted{
+    color:#b7b7b7 !important;
+  }
+}
+</style>
+""", unsafe_allow_html=True)
+#
+
+
+
+
+
+
+
 st.markdown(resumen_html, unsafe_allow_html=True)
 
 # ==========================
@@ -419,4 +477,5 @@ components.html(
 """,
 height=0,
 )
+
 
