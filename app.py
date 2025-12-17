@@ -364,34 +364,45 @@ for _, fila in tabla.iterrows():
 
     components.html(html, height=1080)
     # ✅ BOTÓN FLOTANTE (UNA SOLA VEZ, FUERA DEL FOR)
-    st.markdown("""
-    <style>
-    #scrollTopBtn {
-        position: fixed;
-        bottom: 90px;
-        right: 20px;
-        z-index: 99999;
-        background-color: #0066ff;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 55px;
-        height: 55px;
-        font-size: 26px;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
-    #scrollTopBtn:hover { background-color: #004dcc; }
-    </style>
+    import streamlit.components.v1 as components
+
+    components.html(
+    """
+    <script>
+    (function () {
+      const doc = window.parent.document;
     
-    <button id="scrollTopBtn"
-    onclick="document.getElementById('resumen').scrollIntoView({behavior: 'smooth'});">
-    ⬆
-    </button>
-    """, unsafe_allow_html=True)
-
-
-
-
-
-
+      // Evitar duplicar el botón
+      if (doc.getElementById("scrollTopBtn")) return;
+    
+      const btn = doc.createElement("button");
+      btn.id = "scrollTopBtn";
+      btn.innerHTML = "⬆";
+      btn.title = "Subir al inicio";
+    
+      // Estilos
+      btn.style.position = "fixed";
+      btn.style.bottom = "190px";   // ajusta si tapa algo
+      btn.style.right = "20px";
+      btn.style.zIndex = "999999";
+      btn.style.background = "#0066ff";
+      btn.style.color = "white";
+      btn.style.border = "none";
+      btn.style.borderRadius = "50%";
+      btn.style.width = "55px";
+      btn.style.height = "55px";
+      btn.style.fontSize = "26px";
+      btn.style.cursor = "pointer";
+      btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    
+      // Acción: subir hasta arriba
+      btn.onclick = function () {
+        window.parent.scrollTo({ top: 0, behavior: "smooth" });
+      };
+    
+      doc.body.appendChild(btn);
+    })();
+    </script>
+    """,
+    height=0,
+    )
