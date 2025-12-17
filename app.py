@@ -90,9 +90,18 @@ for _, fila in tabla.iterrows():
    
     item_html = textwrap.dedent(f"""
 <div style="padding:8px 0; border-bottom:1px solid #eee;">
-  🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
+#
+
+🔗 <a href="javascript:void(0)"
+        onclick="goToTicker('{anchor_id}')"
+        style="text-decoration:none; font-weight:800; color:#0066ff;">
     {fila["Ticker"]}
-  </a>
+  </a> 
+  
+ 
+ # 🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
+ #   {fila["Ticker"]}
+ #</a>
   &nbsp; — &nbsp;
   <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
   &nbsp; | &nbsp;
@@ -101,14 +110,41 @@ for _, fila in tabla.iterrows():
 """).strip()
 
     items.append(item_html)
-
+#
+#
 resumen_html = textwrap.dedent(f"""
-<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
+<div style="
+  background-color:#ffffff;
+  padding:16px;
+  border-radius:16px;
+  border:1px solid #dcdcdc;
+  font-family:Arial;
+">
+
+  <script>
+    // Scroll en el documento padre (evita que abra la página dentro del resumen)
+    function goToTicker(id) {{
+      const doc = window.parent.document;
+      const el = doc.getElementById(id);
+      if (el) {{
+        el.scrollIntoView({{ behavior: "smooth", block: "start" }});
+      }}
+    }}
+  </script>
+
   {''.join(items)}
 </div>
 """).strip()
 
-st.markdown(resumen_html, unsafe_allow_html=True)
+components.html(resumen_html, height=600, scrolling=True)
+
+#resumen_html = textwrap.dedent(f"""
+#<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
+#  {''.join(items)}
+#</div>
+#""").strip()
+
+#st.markdown(resumen_html, unsafe_allow_html=True)
 
 # ==========================
 # CREA LA TABLA PARA DESCARGAR
@@ -419,3 +455,4 @@ components.html(
 """,
 height=0,
 )
+
