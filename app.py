@@ -74,7 +74,8 @@ for i in range(len(tabla)):
     tabla.at[i, "Score"] = sc
     tabla.at[i, "Semáforo Final"] = sem
 
-#
+
+# ==========================
 # RESUMEN RÁPIDO SUPERIOR
 # ==========================
 import textwrap
@@ -109,21 +110,9 @@ resumen_html = textwrap.dedent(f"""
 
 st.markdown(resumen_html, unsafe_allow_html=True)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# ==========================
+# CREA LA TABLA PARA DESCARGAR
+# ==========================
 
 st.subheader("📊 Resultados del Análisis Técnico")
 st.dataframe(tabla, use_container_width=True)
@@ -136,11 +125,6 @@ st.download_button(
 )
 
 import streamlit.components.v1 as components
-# ==========================
-
-
-
-
 
 # ==========================
 # TARJETAS HTML SIN RESTRICCIÓN
@@ -405,6 +389,7 @@ for _, fila in tabla.iterrows():
     ⬆
     </button>
     """, unsafe_allow_html=True)
+
 
 
 
