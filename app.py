@@ -80,33 +80,31 @@ for i in range(len(tabla)):
 # ==========================
 import textwrap
 
-# ... tu código arriba ...
 st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
 st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
 
 items = []
+
 for _, fila in tabla.iterrows():
     anchor_id = str(fila["Ticker"]).replace(".", "-")
-   
-    item_html = textwrap.dedent(f"""
-<div style="padding:8px 0; border-bottom:1px solid #eee;">
-  🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
-    {fila["Ticker"]}
-  </a>
-  &nbsp; — &nbsp;
-  <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
-  &nbsp; | &nbsp;
-  <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
-</div>
-""").strip()
 
-    items.append(item_html)
+    items.append(f"""
+    <div class="resumen-item">
+      🔗 <a class="resumen-link" href="#{anchor_id}">
+        {fila["Ticker"]}
+      </a>
+      &nbsp; — &nbsp;
+      <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
+      &nbsp; | &nbsp;
+      <span class="resumen-muted">Score: {fila.get("Score","–")}/6</span>
+    </div>
+    """)
 
-resumen_html = textwrap.dedent(f"""
-<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
+resumen_html = f"""
+<div class="resumen-box">
   {''.join(items)}
 </div>
-""").strip()
+"""
 
 
 #
@@ -477,5 +475,6 @@ components.html(
 """,
 height=0,
 )
+
 
 
