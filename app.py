@@ -74,6 +74,20 @@ for i in range(len(tabla)):
     tabla.at[i, "Score"] = sc
     tabla.at[i, "Semáforo Final"] = sem
 
+# Orden de prioridad para el resumen
+orden_semaforo = {
+    "🟢 COMPRA FUERTE": 1,
+    "🟢 POSIBLE COMPRA": 2,
+    "🟡 ESPERAR": 3,
+    "🔴 POSIBLE VENTA": 4,
+    "🔴 VENTA FUERTE": 5
+}
+
+# Crear columna auxiliar solo para ordenar
+tabla["orden_resumen"] = tabla["Semáforo Final"].map(orden_semaforo)
+
+# Tabla ordenada SOLO para el resumen
+tabla_resumen = tabla.sort_values("orden_resumen")
 
 # ==========================
 # RESUMEN RÁPIDO SUPERIOR
@@ -85,7 +99,8 @@ st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
 st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
 
 items = []
-for _, fila in tabla.iterrows():
+#for _, fila in tabla.iterrows():
+for _, fila in tabla_resumen.iterrows():
     anchor_id = str(fila["Ticker"]).replace(".", "-")
    
     item_html = textwrap.dedent(f"""
@@ -442,6 +457,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
