@@ -90,7 +90,6 @@ for _, fila in tabla.iterrows():
    
     item_html = textwrap.dedent(f"""
 <div style="padding:8px 0; border-bottom:1px solid #eee;">
-#
 
 🔗 <a href="javascript:void(0)"
         onclick="goToTicker('{anchor_id}')"
@@ -98,8 +97,6 @@ for _, fila in tabla.iterrows():
     {fila["Ticker"]}
   </a> 
   
- 
-
   &nbsp; — &nbsp;
   <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
   &nbsp; | &nbsp;
@@ -108,8 +105,7 @@ for _, fila in tabla.iterrows():
 """).strip()
 
     items.append(item_html)
-#
-#
+
 resumen_html = textwrap.dedent(f"""
 <div style="
   background-color:#ffffff;
@@ -136,13 +132,6 @@ resumen_html = textwrap.dedent(f"""
 
 components.html(resumen_html, height=600, scrolling=True)
 
-#resumen_html = textwrap.dedent(f"""
-#<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
-#  {''.join(items)}
-#</div>
-#""").strip()
-
-#st.markdown(resumen_html, unsafe_allow_html=True)
 
 # ==========================
 # CREA LA TABLA PARA DESCARGAR
@@ -453,5 +442,6 @@ components.html(
 """,
 height=0,
 )
+
 
 
