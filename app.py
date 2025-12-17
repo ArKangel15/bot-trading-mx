@@ -80,90 +80,35 @@ for i in range(len(tabla)):
 # ==========================
 import textwrap
 
+# ... tu código arriba ...
 st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
 st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
 
 items = []
-
 for _, fila in tabla.iterrows():
     anchor_id = str(fila["Ticker"]).replace(".", "-")
+   
+    item_html = textwrap.dedent(f"""
+<div style="padding:8px 0; border-bottom:1px solid #eee;">
+  🔗 <a href="#{anchor_id}" style="text-decoration:none; font-weight:800; color:#0066ff;">
+    {fila["Ticker"]}
+  </a>
+  &nbsp; — &nbsp;
+  <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
+  &nbsp; | &nbsp;
+  <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
+</div>
+""").strip()
 
-    items.append(f"""
-    <div class="resumen-item">
-      🔗 <a class="resumen-link" href="#{anchor_id}">
-        {fila["Ticker"]}
-      </a>
-      &nbsp; — &nbsp;
-      <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
-      &nbsp; | &nbsp;
-      <span class="resumen-muted">Score: {fila.get("Score","–")}/6</span>
-    </div>
-    """)
+    items.append(item_html)
 
-resumen_html = f"""
-<div class="resumen-box">
+resumen_html = textwrap.dedent(f"""
+<div style="background:#ffffff; padding:16px; border-radius:16px; border:1px solid #dcdcdc; font-family:Arial;">
   {''.join(items)}
 </div>
-"""
+""").strip()
 
-#
-
-st.markdown("""
-<style>
-/* Contenedor del resumen */
-.resumen-box{
-  padding:16px;
-  border-radius:16px;
-  border:1px solid #dcdcdc;
-  font-family:Arial;
-  background:#ffffff;
-  color:#111111;
-}
-
-/* Cada renglón */
-.resumen-item{
-  padding:8px 0;
-  border-bottom:1px solid #eee;
-}
-
-/* Link ticker */
-.resumen-link{
-  text-decoration:none;
-  font-weight:800;
-  color:#0066ff;
-}
-
-/* Texto secundario */
-.resumen-muted{ color:#666; }
-
-/* --- MODO OSCURO --- */
-@media (prefers-color-scheme: dark) {
-  .resumen-box{
-    background:#0f1116 !important;
-    border:1px solid #2a2f3a !important;
-    color:#e8e8e8 !important;
-  }
-  .resumen-item{
-    border-bottom:1px solid #2a2f3a !important;
-  }
-  .resumen-link{
-    color:#7ab7ff !important;
-  }
-  .resumen-muted{
-    color:#b7b7b7 !important;
-  }
-}
-</style>
-""", unsafe_allow_html=True)
-#
-
-components.html(resumen_html, height=600, scrolling=True)
-
-
-
-
-
-
+st.markdown(resumen_html, unsafe_allow_html=True)
 
 # ==========================
 # CREA LA TABLA PARA DESCARGAR
@@ -474,8 +419,3 @@ components.html(
 """,
 height=0,
 )
-
-
-
-
-
