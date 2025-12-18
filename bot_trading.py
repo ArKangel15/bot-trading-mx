@@ -95,14 +95,29 @@ def analizar(ticker):
 
     if data.empty:
         return None
- 
+    
+    data = data.dropna()
+    
     close = data["Close"]
     high = data["High"]
     low = data["Low"]
 
-    # precio = float(close.iloc[-1])
-    precio = float(close.iloc[-1].item())
+    # Normalizar a Series (por si yfinance devuelve DataFrame)
+    if isinstance(close, pd.DataFrame):
+        close = close.iloc[:, 0]
+    if isinstance(high, pd.DataFrame):
+        high = high.iloc[:, 0]
+    if isinstance(low, pd.DataFrame):
+        low = low.iloc[:, 0]
+    
+    # Asegurar que el último valor exista y sea numérico
+    if close.dropna().empty:
+        return None
 
+    # precio = float(close.iloc[-1])
+    precio = float(close.dropna().iloc[-1])
+
+    
     # -------- INDICADORES --------
     macd, signal = macd_manual(close)
     upper, lower = bollinger_manual(close)
@@ -256,6 +271,7 @@ acciones = [
     "PEP.MX",
     "COST.MX"
 ]
+
 
 
 
