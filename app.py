@@ -69,10 +69,30 @@ def calcular_score_y_semaforo(row):
 tabla["Score"] = ""
 tabla["Semáforo Final"] = ""
 
+
+
 for i in range(len(tabla)):
     sc, sem = calcular_score_y_semaforo(tabla.iloc[i])
     tabla.at[i, "Score"] = sc
     tabla.at[i, "Semáforo Final"] = sem
+
+def semaforo_atr(atr_pct):
+    try:
+        atr_pct = float(atr_pct)
+    except:
+        return "—"
+
+    if atr_pct < 1:
+        return "⚪ Muy lenta"
+    elif atr_pct <= 3:
+        return "🟢 Volatilidad sana"
+    elif atr_pct <= 4:
+        return "🟡 Volátil"
+    else:
+        return "🔴 Muy volátil"
+
+tabla["Semáforo ATR"] = tabla["ATR%"].apply(semaforo_atr)
+
 
 # Orden de prioridad para el resumen
 orden_semaforo = {
@@ -481,6 +501,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
