@@ -70,6 +70,21 @@ def calcular_emas(close):
     ema200 = float(close.ewm(span=200, adjust=False).mean().iloc[-1])
     return ema20, ema50, ema200
 
+# ============================================================
+#                       ATR (14)
+# ============================================================
+def atr_manual(high, low, close, period=14):
+    prev_close = close.shift(1)
+    tr = pd.concat([
+        (high - low),
+        (high - prev_close).abs(),
+        (low - prev_close).abs()
+    ], axis=1).max(axis=1)
+
+    atr = tr.rolling(period).mean()  # simple (rápido). Si quieres Wilder luego lo cambiamos.
+    return float(atr.iloc[-1])
+
+
 
 # ============================================================
 #                    ANALIZAR UNA ACCIÓN
@@ -95,6 +110,29 @@ def analizar(ticker):
     rsi = rsi_manual(close)
     ema20, ema50, ema200 = calcular_emas(close)
 
+
+    atr14 = atr_manual(high, low, close, period=14)
+    atr_pct = (atr14 / precio) * 100 if precio else 0
+
+    # Stop/TP sugeridos SOLO para compras (como tu bot actual)
+    if señal in ["COMPRA FUERTE", "POSIBLE COMPRA"]:
+        mult = 2.0 if señal == "COMPRA FUERTE" else 1.5
+        tipo_stop = "Conservador (2 ATR)" if mult == 2.0 else "Agresivo (1.5 ATR)"
+        stop_sugerido = precio - (mult * atr14)
+        riesgo = precio - stop_sugerido
+        tp1 = precio + (1.0 * riesgo)
+        tp2 = precio + (2.0 * riesgo)
+        riesgo_pct = (riesgo / precio) * 100 if precio else 0
+    else:
+        tipo_stop = "—"
+        stop_sugerido = None
+        tp1 = None
+        tp2 = None
+        riesgo_pct = None
+
+
+
+    
     # -------- ESTADOS --------
     macd_estado = "Alcista" if macd > signal else "Bajista"
     kdj_estado = "Alcista" if K > D else "Bajista"
@@ -159,6 +197,15 @@ def analizar(ticker):
 
         "Señal Final": señal,
 
+        "ATR14": round(atr14, 4),
+        "ATR%": round(atr_pct, 2),
+        "Tipo Stop": tipo_stop,
+        "Stop Sugerido": (round(stop_sugerido, 2) if stop_sugerido is not None else ""),
+        "TP1": (round(tp1, 2) if tp1 is not None else ""),
+        "TP2": (round(tp2, 2) if tp2 is not None else ""),
+        "Riesgo%": (round(riesgo_pct, 2) if riesgo_pct is not None else ""),
+
+
         "Explicación": (
             f"MACD: {macd_estado} | "
             f"KDJ: {kdj_estado} | "
@@ -209,6 +256,7 @@ acciones = [
     "PEP.MX",
     "COST.MX"
 ]
+
 
 
 
