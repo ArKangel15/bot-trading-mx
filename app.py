@@ -343,6 +343,17 @@ for _, fila in tabla.iterrows():
             <small>{explicacion_score}</small>
         </p>
 
+        <h3 style="margin-top:20px;">🎯 Gestión de riesgo (ATR)</h3>
+        <p style="font-size:17px;">
+            <strong>ATR(14):</strong> {fila.get('ATR14','')} &nbsp; | &nbsp;
+            <strong>ATR%:</strong> {fila.get('ATR%','')}%<br>
+            <strong>Tipo de Stop:</strong> {fila.get('Tipo Stop','—')}<br>
+            <strong>Stop sugerido:</strong> {fila.get('Stop Sugerido','')}<br>
+            <strong>TP1:</strong> {fila.get('TP1','')} &nbsp; | &nbsp;
+            <strong>TP2:</strong> {fila.get('TP2','')}<br>
+            <strong>Riesgo%:</strong> {fila.get('Riesgo%','')}%
+        </p>
+
 
         <h3 style="margin-top:20px;">📉 MACD</h3>
         <p style="font-size:17px;">
@@ -457,6 +468,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
