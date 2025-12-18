@@ -355,7 +355,8 @@ for _, fila in tabla.iterrows():
             <small>{explicacion_score}</small>
         </p>
 
-        <h3 style="margin-top:20px;"><strong>Semáforo ATR:</strong> {atr_sem}<br>🎯 Gestión de riesgo (ATR)</h3>
+        <h3 style="margin-top:20px;">🎯 Gestión de riesgo (ATR)</h3>
+        <strong>Semáforo ATR:</strong> {atr_sem}<br>
         <p style="font-size:17px;">
             <strong>ATR(14):</strong> {fila.get('ATR14','')} &nbsp; | &nbsp;
             <strong>ATR%:</strong> {fila.get('ATR%','')}%<br>
@@ -480,6 +481,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
