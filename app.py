@@ -83,13 +83,13 @@ def semaforo_atr(atr_pct):
         return "—"
 
     if atr_pct < 1:
-        return "⚪ Muy lenta"
+        return "⚪ MUY LENTA"
     elif atr_pct <= 3:
-        return "🟢 Volatilidad sana"
+        return "🟢 VOLATILIDAD SANA"
     elif atr_pct <= 4:
-        return "🟡 Volátil"
+        return "🟡 VOLATIL"
     else:
-        return "🔴 Muy volátil"
+        return "🔴 MUY VOLATIL"
 
 tabla["Semáforo ATR"] = tabla["ATR%"].apply(semaforo_atr)
 
@@ -133,11 +133,11 @@ for _, fila in tabla_resumen.iterrows():
   </a> 
   
   &nbsp; — &nbsp;
-  <span style="font-weight:600;">{fila["Semáforo Final"]}</span>
+  <span style="font-weight:500;">{fila["Semáforo Final"]}</span>
   &nbsp; | &nbsp;
   <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
   &nbsp; — &nbsp;
-  <span style="font-weight:600;">{fila["Semáforo ATR"]}</span>
+  <span style="font-weight:500;">{fila["Semáforo ATR"]}</span>
 </div>
 """).strip()
 
@@ -492,6 +492,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
