@@ -357,7 +357,7 @@ for _, fila in tabla.iterrows():
 
         <h3 style="margin-top:20px;">🎯 Gestión de riesgo (ATR)</h3>
         <p style="font-size:17px;">
-            <strong>Semáforo ATR:</strong> {atr_sem}<br>
+            {atr_sem}<br>
             <strong>ATR(14):</strong> {fila.get('ATR14','')} &nbsp; | &nbsp;
             <strong>ATR%:</strong> {fila.get('ATR%','')}%<br>
             <strong>Tipo de Stop:</strong> {fila.get('Tipo Stop','—')}<br>
@@ -481,6 +481,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
