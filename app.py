@@ -178,7 +178,19 @@ for _, fila in tabla.iterrows():
         unsafe_allow_html=True
     )
 
-   
+    # Color del ATR
+    atr_pct = float(fila.get("ATR%", 0) or 0)
+    
+    if atr_pct < 1:
+        atr_sem = "⚪ Muy lenta"
+    elif atr_pct <= 3:
+        atr_sem = "🟢 Volatilidad sana"
+    elif atr_pct <= 4:
+        atr_sem = "🟡 Volátil"
+    else:
+        atr_sem = "🔴 Muy volátil"
+
+    
     # Color del MACD (basado en números, no en texto)
     macd_val = float(fila["MACD"])
     signal_val = float(fila["Signal"])
@@ -347,6 +359,7 @@ for _, fila in tabla.iterrows():
         <p style="font-size:17px;">
             <strong>ATR(14):</strong> {fila.get('ATR14','')} &nbsp; | &nbsp;
             <strong>ATR%:</strong> {fila.get('ATR%','')}%<br>
+            <strong>Semáforo ATR:</strong> {atr_sem}<br>
             <strong>Tipo de Stop:</strong> {fila.get('Tipo Stop','—')}<br>
             <strong>Stop sugerido:</strong> {fila.get('Stop Sugerido','')}<br>
             <strong>TP1:</strong> {fila.get('TP1','')} &nbsp; | &nbsp;
@@ -468,6 +481,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
