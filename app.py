@@ -133,11 +133,11 @@ for _, fila in tabla_resumen.iterrows():
   </a> 
   
   &nbsp; — &nbsp;
-  <span style="font-weight:400;">{fila["Semáforo Final"]}</span>
+  <span style="font-weight:600;">{fila["Semáforo Final"]}</span>
   &nbsp; | &nbsp;
   <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
   &nbsp; — &nbsp;
-  <span style="font-weight:400;">{fila["Semáforo ATR"]}</span>
+  <span style="font-weight:600;">{fila["Semáforo ATR"]}</span>
 </div>
 """).strip()
 
@@ -492,6 +492,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
