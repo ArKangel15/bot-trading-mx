@@ -114,25 +114,7 @@ def analizar(ticker):
     atr14 = atr_manual(high, low, close, period=14)
     atr_pct = (atr14 / precio) * 100 if precio else 0
 
-    # Stop/TP sugeridos SOLO para compras (como tu bot actual)
-    if señal in ["COMPRA FUERTE", "POSIBLE COMPRA"]:
-        mult = 2.0 if señal == "COMPRA FUERTE" else 1.5
-        tipo_stop = "Conservador (2 ATR)" if mult == 2.0 else "Agresivo (1.5 ATR)"
-        stop_sugerido = precio - (mult * atr14)
-        riesgo = precio - stop_sugerido
-        tp1 = precio + (1.0 * riesgo)
-        tp2 = precio + (2.0 * riesgo)
-        riesgo_pct = (riesgo / precio) * 100 if precio else 0
-    else:
-        tipo_stop = "—"
-        stop_sugerido = None
-        tp1 = None
-        tp2 = None
-        riesgo_pct = None
-
-
-
-    
+        
     # -------- ESTADOS --------
     macd_estado = "Alcista" if macd > signal else "Bajista"
     kdj_estado = "Alcista" if K > D else "Bajista"
@@ -165,6 +147,24 @@ def analizar(ticker):
         señal = "POSIBLE VENTA"
     else:
         señal = "ESPERAR"
+
+
+    # Stop/TP sugeridos SOLO para compras (como tu bot actual)
+    if señal in ["COMPRA FUERTE", "POSIBLE COMPRA"]:
+        mult = 2.0 if señal == "COMPRA FUERTE" else 1.5
+        tipo_stop = "Conservador (2 ATR)" if mult == 2.0 else "Agresivo (1.5 ATR)"
+        stop_sugerido = precio - (mult * atr14)
+        riesgo = precio - stop_sugerido
+        tp1 = precio + (1.0 * riesgo)
+        tp2 = precio + (2.0 * riesgo)
+        riesgo_pct = (riesgo / precio) * 100 if precio else 0
+    else:
+        tipo_stop = "—"
+        stop_sugerido = None
+        tp1 = None
+        tp2 = None
+        riesgo_pct = None
+
 
     # -------- RESULTADO --------
     return {
@@ -256,6 +256,7 @@ acciones = [
     "PEP.MX",
     "COST.MX"
 ]
+
 
 
 
