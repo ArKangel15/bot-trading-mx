@@ -103,11 +103,25 @@ orden_semaforo = {
     "🔴 VENTA FUERTE": 5
 }
 
-# Crear columna auxiliar solo para ordenar
-tabla["orden_resumen"] = tabla["Semáforo Final"].map(orden_semaforo)
+# Crear columna auxiliar solo para ordenar por señal
+tabla["orden_resumen"] = tabla["Semáforo Final"].map(orden_semaforo).fillna(99)
 
-# Tabla ordenada SOLO para el resumen
-tabla_resumen = tabla.sort_values("orden_resumen")
+# ✅ Orden de prioridad para volatilidad (ATR)
+orden_atr = {
+    "🟢 Volatilidad sana": 1,
+    "🟡 Volátil": 2,
+    "🔴 Muy volátil": 3,
+    "⚪ Muy lenta": 4,
+    "—": 99,
+    "": 99
+}
+
+# Crear columna auxiliar para ordenar por volatilidad
+tabla["orden_atr"] = tabla["Semáforo ATR"].map(orden_atr).fillna(99)
+
+# ✅ Tabla ordenada para el resumen: primero por señal y luego por volatilidad
+tabla_resumen = tabla.sort_values(["orden_resumen", "orden_atr"], ascending=[True, True])
+
 
 # ==========================
 # RESUMEN RÁPIDO SUPERIOR
@@ -492,6 +506,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
