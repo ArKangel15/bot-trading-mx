@@ -283,8 +283,10 @@ acciones = [
     "AZTECACPO.MX",
     "FUNO11.MX",
     "NEXT25.MX",
-    "AMXB.MX"
+    "AMXB.MX",
+    "AXTELCPO.MX"
 ]
+
 
 
 
