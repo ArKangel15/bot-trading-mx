@@ -276,7 +276,16 @@ acciones = [
     "FMTY14.MX",
     "FIBRAMQ12.MX",
     "GCC.MX",
+    "NKE.MX",
+    "ADSN.MX",
+    "MAT.MX",
+    "ASURB.MX",
+    "AZTECACPO.MX",
+    "FUNO11.MX",
+    "NEXT25.MX",
+    "AMXB.MX"
 ]
+
 
 
 
