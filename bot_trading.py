@@ -269,8 +269,15 @@ acciones = [
     "WALMEX.MX",
     "FEMSAUBD.MX",
     "PEP.MX",
-    "COST.MX"
+    "COST.MX",
+    "MELIN.MX",
+    "AMZN.MX",
+    "PE&OLES.MX",
+    "FMTY14.MX",
+    "FIBRAMQ12.MX",
+    "GCC.MX",
 ]
+
 
 
 
