@@ -108,10 +108,10 @@ tabla["orden_resumen"] = tabla["Semáforo Final"].map(orden_semaforo).fillna(99)
 
 # ✅ Orden de prioridad para volatilidad (ATR)
 orden_atr = {
-    "🟢 Volatilidad sana": 1,
-    "🟡 Volátil": 2,
-    "🔴 Muy volátil": 3,
-    "⚪ Muy lenta": 4,
+    "🟢 VOLATILIDAD SANA": 1,
+    "🟡 VOLATIL": 2,
+    "🔴 MUY VOLATIL": 3,
+    "⚪ MUY LENTA": 4,
     "—": 99,
     "": 99
 }
@@ -506,6 +506,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
