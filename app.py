@@ -5,7 +5,7 @@ from bot_trading import analizar, acciones
 
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
-st.title("📈 Bot de Trading — Acciones Mexicanas")
+st.title("📈 Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs")
 
 # Analizar acciones
@@ -506,6 +506,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
