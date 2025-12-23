@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
-from bot_trading import analizar, acciones
+from bot_trading import acciones, descargar_batch, analizar_con_data
 
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
@@ -9,11 +9,42 @@ st.title("📈 Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
 
 # Analizar acciones
+#resultados = []
+#for acc in acciones:
+#    r = analizar(acc)
+#    if r:
+#        resultados.append(r)
+
+batch = descargar_batch(acciones, period="2y", interval="1d")
+
 resultados = []
-for acc in acciones:
-    r = analizar(acc)
-    if r:
-        resultados.append(r)
+faltantes = []
+
+for t in acciones:
+    try:
+        # batch suele venir con columnas MultiIndex: (Ticker, Campo)
+        if isinstance(batch.columns, pd.MultiIndex):
+            # si el ticker no viene en el paquete, lo marcamos como faltante
+            if t not in batch.columns.get_level_values(0):
+                faltantes.append(t)
+                continue
+
+            df_t = batch[t].copy()  # Open/High/Low/Close/...
+        else:
+            # caso raro: si por alguna razón no viene MultiIndex
+            df_t = batch.copy()
+
+        r = analizar_con_data(t, df_t)
+        if r:
+            resultados.append(r)
+        else:
+            faltantes.append(t)
+
+    except Exception:
+        faltantes.append(t)
+
+st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)}")
+
 
 tabla = pd.DataFrame(resultados)
 
@@ -506,6 +537,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
