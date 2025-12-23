@@ -449,7 +449,7 @@ for _, fila in tabla.iterrows():
     </div>
     """
 
-    components.html(html, height=1080)
+    components.html(html, height=1280)
 components.html(
 """
 <script>
@@ -506,6 +506,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
