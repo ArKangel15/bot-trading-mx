@@ -8,7 +8,7 @@ st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 st.title("📈 Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
 
-batch = descargar_batch(acciones, period="2y", interval="1d")
+
 
 mercado = st.selectbox(
     "📍 Selecciona mercado",
@@ -20,7 +20,7 @@ acciones = acciones_mx if mercado == "México (BMV)" else acciones_usa
 st.caption(f"Analizando: {len(acciones)} tickers — {mercado}")
 
 
-
+batch = descargar_batch(acciones, period="2y", interval="1d")
 resultados = []
 faltantes = []
 
@@ -543,6 +543,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
