@@ -3,9 +3,8 @@ import pandas as pd
 import streamlit.components.v1 as components
 from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
 
-st.set_page_config(page_title="Trading by Arkangel", layout="wide")
-
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+st.set_page_config(page_title="Trading by Arkangel", layout="wide")
 
 st.title("📈 Trading de Acciones by Arkangel")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
@@ -561,6 +560,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
