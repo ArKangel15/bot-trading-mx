@@ -8,13 +8,6 @@ st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 st.title("📈 Trading — Acciones Mexicanas")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
 
-# Analizar acciones
-#resultados = []
-#for acc in acciones:
-#    r = analizar(acc)
-#    if r:
-#        resultados.append(r)
-
 batch = descargar_batch(acciones, period="2y", interval="1d")
 
 resultados = []
@@ -45,7 +38,8 @@ for t in acciones:
 
 st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)}")
 
-st.write("Faltantes:", faltantes)
+#Esta funcion me ayuda a saber cuales son las acciones faltantes.
+# st.write("Faltantes:", faltantes)
 
 tabla = pd.DataFrame(resultados)
 
@@ -538,6 +532,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
