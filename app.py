@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
-from bot_trading import acciones, descargar_batch, analizar_con_data
+from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
 
 st.set_page_config(page_title="Bot de Trading MX", layout="wide")
 
@@ -543,6 +543,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
