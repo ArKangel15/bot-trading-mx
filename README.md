@@ -1,2 +1,2 @@
-# Bot de Trading MX
+# Trading by Arkangel
 Primer archivo para iniciar el repositorio.
