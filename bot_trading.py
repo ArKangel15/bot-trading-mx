@@ -285,6 +285,7 @@ acciones = [
     "NEXT25.MX",
     "AMXB.MX",
     "AXTELCPO.MX",
+    "NFLX.MX",
     "EDOARDOB.MX",
     "AGUA.MX",
     "CREAL.MX",
@@ -323,6 +324,7 @@ acciones = [
     "UNIFINA.MX",
     "STORAGE18.MX"
 ]
+
 
 
 
