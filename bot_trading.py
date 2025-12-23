@@ -250,7 +250,7 @@ def analizar_con_data(ticker, data):
 # ============================================================
 #               LISTA DE ACCIONES DEL MERCADO MX
 # ============================================================
-acciones = [
+acciones_mx = [
     "HERDEZ.MX",
     "TLEVISACPO.MX",
     "MEGACPO.MX",
@@ -340,4 +340,29 @@ acciones = [
     "STORAGE18.MX"
 ]
 
+# ============================================================
+#               LISTA DE ACCIONES DE EUA (Yahoo)
+# ============================================================
+acciones_usa = [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "GOOGL",
+    "META",
+    "TSLA",
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "JPM",
+    "BAC",
+    "WMT",
+    "COST",
+    "XOM",
+    "UNH",
+    "JNJ",
+    "KO",
+    "PG"
+]
 
