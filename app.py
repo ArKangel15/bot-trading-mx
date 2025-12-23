@@ -3,7 +3,9 @@ import pandas as pd
 import streamlit.components.v1 as components
 from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
 
-st.set_page_config(page_title="Bot de Trading MX", layout="wide")
+st.set_page_config(page_title="Trading by Arkangel", layout="wide")
+
+st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 
 st.title("📈 Trading de Acciones by Arkangel")
 st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
@@ -493,55 +495,73 @@ components.html(
 (function () {
   const doc = window.parent.document;
 
-  // evita duplicarlo
-  if (doc.getElementById("scrollTopBtn")) return;
+  // Si ya existe, no lo recreamos, pero sí aseguramos que el click funcione
+  let btn = doc.getElementById("scrollTopBtn");
 
-  const btn = doc.createElement("button");
-  btn.id = "scrollTopBtn";
-  btn.innerHTML = "⬆";
-  btn.title = "Subir al inicio";
+  if (!btn) {
+    btn = doc.createElement("button");
+    btn.id = "scrollTopBtn";
+    btn.innerHTML = "⬆";
+    btn.title = "Subir al inicio";
 
-  btn.style.position = "fixed";
-  btn.style.bottom = "190px";     // ajusta si estorba algo
-  btn.style.right = "20px";
-  btn.style.zIndex = "999999";
-  btn.style.background = "#0066ff";
-  btn.style.color = "white";
-  btn.style.border = "none";
-  btn.style.borderRadius = "50%";
-  btn.style.width = "55px";
-  btn.style.height = "55px";
-  btn.style.fontSize = "26px";
-  btn.style.cursor = "pointer";
-  btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+    btn.style.position = "fixed";
+    btn.style.bottom = "190px";
+    btn.style.right = "20px";
+    btn.style.zIndex = "999999";
+    btn.style.background = "#0066ff";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "50%";
+    btn.style.width = "55px";
+    btn.style.height = "55px";
+    btn.style.fontSize = "26px";
+    btn.style.cursor = "pointer";
+    btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
 
-  function scrollToTop() {
-    // Intentar varios contenedores (según versión / hosting)
-    const candidates = [
-      doc.querySelector('[data-testid="stMain"]'),
-      doc.querySelector('[data-testid="stAppViewContainer"]'),
-      doc.documentElement,
-      doc.body
-    ];
+    doc.body.appendChild(btn);
+  }
 
-    for (const el of candidates) {
-      if (!el) continue;
-      try { el.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {}
-      try { el.scrollTop = 0; } catch (e) {}  
+  function goTop() {
+    const topEl = doc.getElementById("top");
+
+    // 1) Si existe el ancla, esta es la forma más confiable:
+    if (topEl && topEl.scrollIntoView) {
+      try {
+        topEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      } catch (e) {}
     }
 
-    // Último recurso
+    // 2) Fallback (por si el ancla aún no está renderizada):
+    try { doc.documentElement.scrollTop = 0; } catch (e) {}
+    try { doc.body.scrollTop = 0; } catch (e) {}
     try { window.parent.scrollTo({ top: 0, left: 0, behavior: "smooth" }); } catch (e) {}
     try { window.parent.scrollTo(0, 0); } catch (e) {}
   }
 
-  btn.addEventListener("click", scrollToTop);
-  doc.body.appendChild(btn);
+  // Re-asignar handler SIEMPRE (porque Streamlit re-renderiza)
+  btn.onclick = goTop;
+
+  // Reintento automático si el DOM cambia y el "top" aparece después
+  // (pasa al cambiar selector MX/USA)
+  const obs = new MutationObserver(() => {
+    const topEl = doc.getElementById("top");
+    if (topEl) {
+      // ya existe, no necesitamos observar más
+      obs.disconnect();
+    }
+  });
+
+  try {
+    obs.observe(doc.body, { childList: true, subtree: true });
+    setTimeout(() => { try { obs.disconnect(); } catch(e){} }, 8000);
+  } catch(e) {}
 })();
 </script>
 """,
 height=0,
 )
+
 
 
 
