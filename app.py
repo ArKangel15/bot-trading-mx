@@ -526,13 +526,12 @@ components.html(
 
     for (const el of candidates) {
       if (!el) continue;
-      try {
-        el.scrollTo({ top: 0, behavior: "smooth" });
-        return;
-      } catch (e) {}
+      try { el.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) {}
+      try { el.scrollTop = 0; } catch (e) {}  
     }
 
     // Último recurso
+    try { window.parent.scrollTo({ top: 0, left: 0, behavior: "smooth" }); } catch (e) {}
     try { window.parent.scrollTo(0, 0); } catch (e) {}
   }
 
@@ -543,6 +542,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
