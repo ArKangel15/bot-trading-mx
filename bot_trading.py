@@ -337,7 +337,9 @@ acciones_mx = [
     "TRAXIONA.MX",
     "PINFRAL.MX",
     "UNIFINA.MX",
-    "STORAGE18.MX"
+    "STORAGE18.MX",
+    "Q.MX",
+    "CUERVO.MX"
 ]
 
 # ============================================================
@@ -365,4 +367,5 @@ acciones_usa = [
     "KO",
     "PG"
 ]
+
 
