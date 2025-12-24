@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
+from datetime import datetime
 
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 st.set_page_config(page_title="Trading by Arkangel", layout="wide")
@@ -22,6 +23,7 @@ st.caption(f"Analizando: {len(acciones)} tickers — {mercado}")
 
 
 batch = descargar_batch(acciones, period="2y", interval="1d")
+batch_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 resultados = []
 faltantes = []
 
@@ -48,7 +50,7 @@ for t in acciones:
     except Exception:
         faltantes.append(t)
 
-st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)}")
+st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)} | Batch: {batch_ts}")
 
 #Esta funcion me ayuda a saber cuales son las acciones faltantes.
 # st.write("Faltantes:", faltantes)
@@ -562,6 +564,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
