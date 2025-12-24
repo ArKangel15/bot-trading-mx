@@ -542,8 +542,9 @@ acciones_usa = [
     "NSRX",
     "AGAE",
     "OFLX",
-    "SNGX",
+    "SNGX"
 ]
+
 
 
 
