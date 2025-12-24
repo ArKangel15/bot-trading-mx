@@ -197,10 +197,10 @@ for _, fila in tabla_resumen.iterrows():
   <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
    &nbsp; | &nbsp;
   <span style="color:#111;">
-    💲 {precio_actual} 
-    &nbsp; | &nbsp; 🧱 {soporte_est}
-    &nbsp; | &nbsp; ⚖️ {precio_medio}
-    &nbsp; | &nbsp; 🏁 {zona_cara}
+    💲 {fila["Precio"]} 
+    &nbsp; | &nbsp; 🧱 {fila["Soporte Estadístico"]}
+    &nbsp; | &nbsp; ⚖️ {fila["Precio Medio"]}
+    &nbsp; | &nbsp; 🏁 {fila["Zona Cara"]}
   </span>
   &nbsp; | &nbsp;
   <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
@@ -578,6 +578,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
