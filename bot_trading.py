@@ -316,7 +316,6 @@ acciones_mx = [
     "FUNO11.MX",
     "NEXT25.MX",
     "AMXB.MX",
-    "AXTELCPO.MX",
     "NFLX.MX",
     "EDOARDOB.MX",
     "AGUA.MX",
@@ -562,4 +561,5 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
