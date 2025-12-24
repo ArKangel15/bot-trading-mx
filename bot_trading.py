@@ -149,7 +149,7 @@ def analizar_con_data(ticker, data):
     atr_pct = (atr14 / precio) * 100 if precio else 0
 
     # -------- SOPORTE ESTADÍSTICO (Percentiles 2y) --------
-serie_precios = close.dropna()
+    serie_precios = close.dropna()
 
     if len(serie_precios) >= 50:
         soporte_est = float(serie_precios.quantile(0.20))  # P20
@@ -562,3 +562,4 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
