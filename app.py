@@ -171,7 +171,7 @@ import textwrap
 
 # ... tu código arriba ...
 st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
-st.subheader("📌 Resumen rápido (toca el ticker para ir a su tarjeta)")
+st.subheader("📌 Resumen rápido (toca la acción para ir a su tarjeta)")
 
 items = []
 #for _, fila in tabla.iterrows():
@@ -565,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
