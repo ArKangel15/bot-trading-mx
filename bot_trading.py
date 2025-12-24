@@ -339,7 +339,8 @@ acciones_mx = [
     "UNIFINA.MX",
     "STORAGE18.MX",
     "Q.MX",
-    "CUERVO.MX"
+    "CUERVO.MX",
+    "NESNN.MX"
 ]
 
 # ============================================================
@@ -544,6 +545,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
