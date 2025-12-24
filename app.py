@@ -51,7 +51,7 @@ for t in acciones:
     except Exception:
         faltantes.append(t)
 
-st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)} | Batch: {batch_ts}")
+st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)} | Datos del: {batch_ts}")
 
 #Esta funcion me ayuda a saber cuales son las acciones faltantes.
 # st.write("Faltantes:", faltantes)
@@ -565,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
