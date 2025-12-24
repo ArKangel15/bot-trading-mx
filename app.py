@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit.components.v1 as components
 from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
 from datetime import datetime
+import pytz
 
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 st.set_page_config(page_title="Trading by Arkangel", layout="wide")
@@ -22,8 +23,8 @@ acciones = acciones_mx if mercado == "México (BMV)" else acciones_usa
 st.caption(f"Analizando: {len(acciones)} tickers — {mercado}")
 
 
-batch = descargar_batch(acciones, period="2y", interval="1d")
-batch_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+tz_mx = pytz.timezone("America/Mazatlan")
+batch_ts = datetime.now(tz_mx).strftime("%Y-%m-%d %H:%M:%S")
 resultados = []
 faltantes = []
 
@@ -564,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
