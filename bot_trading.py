@@ -148,6 +148,19 @@ def analizar_con_data(ticker, data):
         return None
     atr_pct = (atr14 / precio) * 100 if precio else 0
 
+    # -------- SOPORTE ESTADÍSTICO (Percentiles 2y) --------
+serie_precios = close.dropna()
+
+if len(serie_precios) >= 50:
+    soporte_est = float(serie_precios.quantile(0.20))  # P20
+    precio_medio = float(serie_precios.quantile(0.50)) # P50
+    zona_cara = float(serie_precios.quantile(0.80))    # P80
+else:
+    soporte_est = None
+    precio_medio = None
+    zona_cara = None
+
+
     # -------- ESTADOS --------
     macd_estado = "Alcista" if macd > signal else "Bajista"
     kdj_estado = "Alcista" if K > D else "Bajista"
@@ -226,6 +239,10 @@ def analizar_con_data(ticker, data):
         "Precio EMA50": precio_ema50,
 
         "Señal Final": señal,
+
+        "Soporte Estadístico": (round(soporte_est, 2) if soporte_est is not None else ""),
+        "Precio Medio": (round(precio_medio, 2) if precio_medio is not None else ""),
+        "Zona Cara": (round(zona_cara, 2) if zona_cara is not None else ""),
 
         "ATR14": round(float(atr14), 4),
         "ATR%": round(float(atr_pct), 2),
@@ -545,6 +562,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
