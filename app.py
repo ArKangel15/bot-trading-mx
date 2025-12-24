@@ -22,7 +22,7 @@ mercado = st.selectbox(
 acciones = acciones_mx if mercado == "México (BMV)" else acciones_usa
 st.caption(f"Analizando: {len(acciones)} tickers — {mercado}")
 
-
+batch = descargar_batch(acciones, period="2y", interval="1d")
 tz_mx = pytz.timezone("America/Mazatlan")
 batch_ts = datetime.now(tz_mx).strftime("%Y-%m-%d %H:%M:%S")
 resultados = []
@@ -565,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
