@@ -1,7 +1,12 @@
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
-from bot_trading import acciones_mx, acciones_usa, descargar_batch, analizar_con_data
+from bot_trading import (
+    acciones_mx,
+    acciones_usa,
+    descargar_batch,
+    analizar_con_data
+)
 from datetime import datetime
 import pytz
 
@@ -565,6 +570,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
