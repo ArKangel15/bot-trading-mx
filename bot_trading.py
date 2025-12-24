@@ -151,14 +151,14 @@ def analizar_con_data(ticker, data):
     # -------- SOPORTE ESTADÍSTICO (Percentiles 2y) --------
 serie_precios = close.dropna()
 
-if len(serie_precios) >= 50:
-    soporte_est = float(serie_precios.quantile(0.20))  # P20
-    precio_medio = float(serie_precios.quantile(0.50)) # P50
-    zona_cara = float(serie_precios.quantile(0.80))    # P80
-else:
-    soporte_est = None
-    precio_medio = None
-    zona_cara = None
+    if len(serie_precios) >= 50:
+        soporte_est = float(serie_precios.quantile(0.20))  # P20
+        precio_medio = float(serie_precios.quantile(0.50)) # P50
+        zona_cara = float(serie_precios.quantile(0.80))    # P80
+    else:
+        soporte_est = None
+        precio_medio = None
+        zona_cara = None
 
 
     # -------- ESTADOS --------
@@ -562,4 +562,3 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
-print("bot_trading cargado OK")
