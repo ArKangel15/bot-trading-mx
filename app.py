@@ -194,7 +194,7 @@ for _, fila in tabla_resumen.iterrows():
   &nbsp; — &nbsp;
   <span style="font-weight:800;">{fila["Semáforo ATR"]}</span>
   &nbsp; — &nbsp;
-  <span style="font-weight:800;">RIESGO {fila["ATR%"]}%</span>
+  <span style="font-weight:800;">RIESGO {fila["Riesgo%"]}%</span>
 </div>
 """).strip()
 
@@ -565,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
