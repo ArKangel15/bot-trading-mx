@@ -54,7 +54,7 @@ for t in acciones:
 st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)} | Datos del: {batch_ts}")
 
 #Esta funcion me ayuda a saber cuales son las acciones faltantes.
-# st.write("Faltantes:", faltantes)
+st.write("Faltantes:", faltantes)
 
 tabla = pd.DataFrame(resultados)
 
@@ -565,6 +565,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
