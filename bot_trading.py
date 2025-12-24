@@ -365,7 +365,36 @@ acciones_usa = [
     "UNH",
     "JNJ",
     "KO",
-    "PG"
+    "PG",
+    "SOBR",
+    "KIDZW",
+    "NCL",
+    "AMCI",
+    "EUDA",
+    "MWG",
+    "INDP",
+    "DVAX",
+    "FMFC",
+    "SIDU",
+    "IZM",
+    "EWTX",
+    "VCICW",
+    "MODD",
+    "CNCK",
+    "CREV",
+    "TEAD",
+    "EQ",
+    "AGIO",
+    "SRXH",
+    "GLSI",
+    "DRMA",
+    "RPTX",
+    "BIXIW",
+    "TSE",
+    "ZSPC",
+    "INAB",
+    "NCEW"
 ]
+
 
 
