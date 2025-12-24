@@ -562,11 +562,4 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
-
-
-
-
-
-
-
-
+print("bot_trading cargado OK")
