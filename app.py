@@ -169,6 +169,103 @@ tabla["orden_atr"] = tabla["Semáforo ATR"].map(orden_atr).fillna(99)
 # ✅ Tabla ordenada para el resumen: primero por señal y luego por volatilidad
 tabla_resumen = tabla.sort_values(["orden_resumen", "orden_atr"], ascending=[True, True])
 
+# ==========================
+# ✅ SETUP PERFECTO (compras)
+# ==========================
+st.subheader("✅ Setup perfecto (oportunidades de compra)")
+
+def to_float(x):
+    try:
+        if x is None or x == "":
+            return None
+        return float(x)
+    except:
+        return None
+
+def es_setup_perfecto(row):
+    sem = str(row.get("Semáforo Final", "")).upper()
+    atr_sem = str(row.get("Semáforo ATR", "")).upper()
+    score = to_float(row.get("Score", None))
+    riesgo = to_float(row.get("Riesgo%", None))
+    precio = to_float(row.get("Precio", None))
+    soporte = to_float(row.get("Soporte Estadístico", None))
+    medio = to_float(row.get("Precio Medio", None))
+    cara = to_float(row.get("Zona Cara", None))
+
+    # 1) Señal (momentum)
+    if "COMPRA FUERTE" not in sem and "POSIBLE COMPRA" not in sem:
+        return False
+
+    # 2) Volatilidad operable
+    if "SANA" not in atr_sem:
+        return False
+
+    # 3) Score mínimo
+    if score is None or score < 3:
+        return False
+
+    # 4) Riesgo máximo (ATR %)
+    if riesgo is None or riesgo > 5:
+        return False
+
+    # 5) Precio en zona “barata” (P20 a P50) y NO en zona cara
+    #    - si no hay percentiles calculados, no lo considera perfecto
+    if precio is None or soporte is None or medio is None or cara is None:
+        return False
+
+    # Regla: precio <= P50 (ideal), y evitar que esté muy cerca/arriba de P80
+    if precio > medio:
+        return False
+    if precio >= cara:
+        return False
+
+    return True
+
+tabla_setup = tabla[tabla.apply(es_setup_perfecto, axis=1)].copy()
+
+if tabla_setup.empty:
+    st.info("No hay setups perfectos ahorita. (Busca COMPRA + Volatilidad Sana + Score≥3 + Riesgo≤5% + Precio entre Soporte y Precio Medio)")
+else:
+    # Ordena mejores primero: Compra fuerte > posible compra, mayor score, menor riesgo, más cerca de soporte
+    def prioridad_sem(sem):
+        sem = str(sem).upper()
+        if "COMPRA FUERTE" in sem: return 1
+        if "POSIBLE COMPRA" in sem: return 2
+        return 9
+
+    tabla_setup["prio_sem"] = tabla_setup["Semáforo Final"].apply(prioridad_sem)
+    tabla_setup["riesgo_num"] = tabla_setup["Riesgo%"].apply(to_float)
+    tabla_setup["score_num"] = tabla_setup["Score"].apply(to_float)
+
+    # Distancia a soporte (qué tan “barata” está vs P20)
+    tabla_setup["dist_soporte"] = tabla_setup.apply(
+        lambda r: abs(to_float(r["Precio"]) - to_float(r["Soporte Estadístico"]))
+        if to_float(r["Precio"]) is not None and to_float(r["Soporte Estadístico"]) is not None else 999999,
+        axis=1
+    )
+
+    tabla_setup = tabla_setup.sort_values(
+        by=["prio_sem", "score_num", "riesgo_num", "dist_soporte"],
+        ascending=[True, False, True, True]
+    )
+
+    st.dataframe(
+        tabla_setup[[
+            "Ticker",
+            "Semáforo Final",
+            "Precio",
+            "Soporte Estadístico",
+            "Precio Medio",
+            "Zona Cara",
+            "Score",
+            "Semáforo ATR",
+            "Riesgo%"
+        ]],
+        use_container_width=True
+    )
+
+
+
 
 # ==========================
 # RESUMEN RÁPIDO SUPERIOR
@@ -578,6 +675,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
