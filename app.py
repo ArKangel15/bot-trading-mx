@@ -172,7 +172,7 @@ tabla_resumen = tabla.sort_values(["orden_resumen", "orden_atr"], ascending=[Tru
 # ==========================
 # ✅ SETUP PERFECTO (compras)
 # ==========================
-st.subheader("✅ Setup perfecto (oportunidades de compra)")
+st.subheader("✅ Oportunidad de compra")
 
 def to_float(x):
     try:
@@ -675,6 +675,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
