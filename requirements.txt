@@ -1,4 +1,7 @@
 streamlit
-pandas
-yfinance
 ta
+fastapi
+uvicorn
+yfinance
+pandas
+pytz
