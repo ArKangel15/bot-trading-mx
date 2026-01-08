@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Query
 from datetime import datetime
 import pytz
+import pandas as pd
 
 from bot_trading import (
     descargar_batch,
@@ -11,15 +12,78 @@ from bot_trading import (
 
 app = FastAPI(title="Trading Arkangel API")
 
+# ======================================================
+# ROOT
+# ======================================================
 @app.get("/")
 def root():
     return {"status": "ok", "message": "Trading Arkangel API activa"}
 
+# ======================================================
+# SEMÁFORO ATR (MISMO QUE STREAMLIT)
+# ======================================================
+def semaforo_atr(atr_pct):
+    try:
+        atr_pct = float(atr_pct)
+    except:
+        return "—"
+
+    if atr_pct < 1:
+        return "⚪ MUY LENTA"
+    elif atr_pct <= 3:
+        return "🟢 VOLATILIDAD SANA"
+    elif atr_pct <= 4:
+        return "🟡 VOLATIL"
+    else:
+        return "🔴 MUY VOLATIL"
+
+# ======================================================
+# SETUP PERFECTO (MISMA LÓGICA STREAMLIT)
+# ======================================================
+def es_setup_perfecto(r):
+    try:
+        sem = str(r["Señal Final"]).upper()
+        atr_sem = semaforo_atr(r["ATR%"])
+        score = float(r.get("Score", 0))
+        riesgo = float(r["Riesgo%"])
+        precio = float(r["Precio"])
+        soporte = float(r["Soporte Estadístico"])
+        medio = float(r["Precio Medio"])
+        cara = float(r["Zona Cara"])
+    except:
+        return False
+
+    # 1) Señal
+    if "COMPRA FUERTE" not in sem and "POSIBLE COMPRA" not in sem:
+        return False
+
+    # 2) Volatilidad sana
+    if atr_sem != "🟢 VOLATILIDAD SANA":
+        return False
+
+    # 3) Score mínimo
+    if score < 3:
+        return False
+
+    # 4) Riesgo máximo
+    if riesgo > 5:
+        return False
+
+    # 5) Precio en zona barata (P20–P50) y NO zona cara
+    if precio > medio:
+        return False
+    if precio >= cara:
+        return False
+
+    return True
+
+# ======================================================
+# ENDPOINT OPORTUNIDAD DE COMPRA
+# ======================================================
 @app.get("/oportunidad-compra")
 def oportunidad_compra(market: str = Query("MX")):
     try:
         acciones = acciones_mx if market.upper() == "MX" else acciones_usa
-
         batch = descargar_batch(acciones, period="2y", interval="1d")
 
         resultados = []
@@ -35,12 +99,8 @@ def oportunidad_compra(market: str = Query("MX")):
             if not r:
                 continue
 
-            # 👉 MISMA LÓGICA DE "OPORTUNIDAD DE COMPRA"
-            if (
-                r["Señal Final"] in ["COMPRA FUERTE", "POSIBLE COMPRA"]
-                and r["Semáforo ATR"] == "🟢 VOLATILIDAD SANA"
-                and float(r["Riesgo%"]) <= 5
-            ):
+            # 👉 SOLO SETUP PERFECTO
+            if es_setup_perfecto(r):
                 resultados.append({
                     "ticker": r["Ticker"],
                     "senal": r["Señal Final"],
@@ -58,6 +118,7 @@ def oportunidad_compra(market: str = Query("MX")):
             "market": market.upper(),
             "hay_oportunidad": len(resultados) > 0,
             "total": len(resultados),
+            "timestamp": timestamp,
             "setups": resultados
         }
 
