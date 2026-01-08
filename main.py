@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Query
 from datetime import datetime
 import pytz
-import pandas as pd
 
 from bot_trading import (
     descargar_batch,
@@ -38,13 +37,12 @@ def semaforo_atr(atr_pct):
         return "🔴 MUY VOLATIL"
 
 # ======================================================
-# SETUP PERFECTO (MISMA LÓGICA STREAMLIT)
+# SETUP PERFECTO (SIN SCORE)
 # ======================================================
 def es_setup_perfecto(r):
     try:
         sem = str(r["Señal Final"]).upper()
         atr_sem = semaforo_atr(r["ATR%"])
-        score = float(r.get("Score", 0))
         riesgo = float(r["Riesgo%"])
         precio = float(r["Precio"])
         soporte = float(r["Soporte Estadístico"])
@@ -53,7 +51,7 @@ def es_setup_perfecto(r):
     except:
         return False
 
-    # 1) Señal
+    # 1) Señal de compra
     if "COMPRA FUERTE" not in sem and "POSIBLE COMPRA" not in sem:
         return False
 
@@ -61,15 +59,11 @@ def es_setup_perfecto(r):
     if atr_sem != "🟢 VOLATILIDAD SANA":
         return False
 
-    # 3) Score mínimo
-    if score < 3:
-        return False
-
-    # 4) Riesgo máximo
+    # 3) Riesgo máximo
     if riesgo > 5:
         return False
 
-    # 5) Precio en zona barata (P20–P50) y NO zona cara
+    # 4) Precio en zona barata (P20–P50)
     if precio > medio:
         return False
     if precio >= cara:
@@ -99,7 +93,6 @@ def oportunidad_compra(market: str = Query("MX")):
             if not r:
                 continue
 
-            # 👉 SOLO SETUP PERFECTO
             if es_setup_perfecto(r):
                 resultados.append({
                     "ticker": r["Ticker"],
