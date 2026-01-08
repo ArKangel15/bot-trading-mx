@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
+import json
+from urllib.parse import parse_qs
 from bot_trading import (
     descargar_batch,
     analizar_con_data,    
@@ -63,6 +65,32 @@ st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(fa
 #st.write("Faltantes:", faltantes)
 
 tabla = pd.DataFrame(resultados)
+# ==========================
+# MODO JSON PARA n8n
+# ==========================
+query_params = st.query_params
+modo = query_params.get("mode", None)
+
+if modo == "json":
+    salida = []
+
+    for _, row in tabla.iterrows():
+        # Solo setups perfectos u oportunidades de compra
+        if row.get("Semáforo Final") in ["🟢 COMPRA FUERTE", "🟢 POSIBLE COMPRA"]:
+            salida.append({
+                "ticker": row.get("Ticker"),
+                "tipo_senal": row.get("Semáforo Final"),
+                "precio_entrada": row.get("Precio"),
+                "stop_loss": row.get("Stop Sugerido"),
+                "tp1": row.get("TP1"),
+                "tp2": row.get("TP2"),
+                "riesgo_pct": row.get("Riesgo%"),
+                "score": row.get("Score"),
+                "timestamp": row.get("Fecha"),
+            })
+
+    st.json(salida)
+    st.stop()
 
 def calcular_score_y_semaforo(row):
     score = 0
@@ -675,6 +703,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
