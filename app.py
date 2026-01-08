@@ -1,20 +1,207 @@
-from fastapi import FastAPI, Query
+import streamlit as st
+import pandas as pd
+import streamlit.components.v1 as components
+import json
+from urllib.parse import parse_qs
 from datetime import datetime
 import pytz
-import pandas as pd
 
 from bot_trading import (
     descargar_batch,
-    analizar_con_data,
+    analizar_con_data,    
     acciones_mx,
     acciones_usa,
 )
 
-app = FastAPI(title="Trading Arkangel API")
+st.markdown('<div id="top"></div>', unsafe_allow_html=True)
+st.set_page_config(page_title="Trading by Arkangel", layout="wide")
 
-# =========================================================
-# UTILIDADES
-# =========================================================
+st.title("📈 Trading de Acciones by Arkangel")
+st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
+
+
+
+mercado = st.selectbox(
+    "📍 Selecciona mercado",
+    ["México (BMV)", "Estados Unidos (USA)"],
+    index=0
+)
+
+acciones = acciones_mx if mercado == "México (BMV)" else acciones_usa
+st.caption(f"Analizando: {len(acciones)} acciones — {mercado}")
+
+batch = descargar_batch(acciones, period="2y", interval="1d")
+tz_mx = pytz.timezone("America/Mazatlan")
+batch_ts = datetime.now(tz_mx).strftime("%Y-%m-%d %H:%M:%S")
+resultados = []
+faltantes = []
+
+for t in acciones:
+    try:
+        # batch suele venir con columnas MultiIndex: (Ticker, Campo)
+        if isinstance(batch.columns, pd.MultiIndex):
+            # si el ticker no viene en el paquete, lo marcamos como faltante
+            if t not in batch.columns.get_level_values(0):
+                faltantes.append(t)
+                continue
+
+            df_t = batch[t].copy()  # Open/High/Low/Close/...
+        else:
+            # caso raro: si por alguna razón no viene MultiIndex
+            df_t = batch.copy()
+
+        r = analizar_con_data(t, df_t)
+        if r:
+            resultados.append(r)
+        else:
+            faltantes.append(t)
+
+    except Exception:
+        faltantes.append(t)
+
+st.caption(f"Total: {len(acciones)} | OK: {len(resultados)} | Faltantes: {len(faltantes)} | Datos del: {batch_ts}")
+
+#Esta funcion me ayuda a saber cuales son las acciones faltantes.
+#st.write("Faltantes:", faltantes)
+
+tabla = pd.DataFrame(resultados)
+# ==========================
+# MODO JSON PARA n8n
+# ==========================
+query_params = st.query_params
+modo = query_params.get("mode", None)
+
+if modo == "json":
+    salida = []
+
+    for _, row in tabla.iterrows():
+        # Solo setups perfectos u oportunidades de compra
+        if row.get("Semáforo Final") in ["🟢 COMPRA FUERTE", "🟢 POSIBLE COMPRA"]:
+            salida.append({
+                "ticker": row.get("Ticker"),
+                "tipo_senal": row.get("Semáforo Final"),
+                "precio_entrada": row.get("Precio"),
+                "stop_loss": row.get("Stop Sugerido"),
+                "tp1": row.get("TP1"),
+                "tp2": row.get("TP2"),
+                "riesgo_pct": row.get("Riesgo%"),
+                "score": row.get("Score"),
+                "timestamp": row.get("Fecha"),
+            })
+
+    st.json(salida)
+    st.stop()
+
+def calcular_score_y_semaforo(row):
+    score = 0
+
+    # MACD
+    macd_val = float(row["MACD"])
+    signal_val = float(row["Signal"])
+    score += 1 if macd_val > signal_val else -1
+
+    # RSI
+    rsi_val = float(row["RSI"])
+    if rsi_val < 30:
+        score += 1
+    elif rsi_val > 70:
+        score -= 1
+
+    # Bollinger
+    boll = str(row["Bollinger Señal"])
+    if boll == "Sobreventa":
+        score += 1
+    elif boll == "Sobrecompra":
+        score -= 1
+
+    # Tendencia (EMA50 vs EMA200)
+    tendencia = str(row["Tendencia"])
+    score += 1 if tendencia == "Alcista" else -1
+
+    # Precio vs EMA50
+    precio_ema50 = str(row["Precio EMA50"])
+    score += 1 if precio_ema50 == "Arriba" else -1
+
+    # KDJ
+    K_val = float(row["K"])
+    D_val = float(row["D"])
+    score += 1 if K_val > D_val else -1
+
+    # Semáforo final por score
+    if score >= 4:
+        sem = "🟢 COMPRA FUERTE"
+    elif score >= 2:
+        sem = "🟢 POSIBLE COMPRA"
+    elif score <= -4:
+        sem = "🔴 VENTA FUERTE"
+    elif score <= -2:
+        sem = "🔴 POSIBLE VENTA"
+    else:
+        sem = "🟡 ESPERAR"
+
+    return score, sem
+
+tabla["Score"] = ""
+tabla["Semáforo Final"] = ""
+
+
+
+for i in range(len(tabla)):
+    sc, sem = calcular_score_y_semaforo(tabla.iloc[i])
+    tabla.at[i, "Score"] = sc
+    tabla.at[i, "Semáforo Final"] = sem
+
+def semaforo_atr(atr_pct):
+    try:
+        atr_pct = float(atr_pct)
+    except:
+        return "—"
+
+    if atr_pct < 1:
+        return "⚪ MUY LENTA"
+    elif atr_pct <= 3:
+        return "🟢 VOLATILIDAD SANA"
+    elif atr_pct <= 4:
+        return "🟡 VOLATIL"
+    else:
+        return "🔴 MUY VOLATIL"
+
+tabla["Semáforo ATR"] = tabla["ATR%"].apply(semaforo_atr)
+
+
+# Orden de prioridad para el resumen
+orden_semaforo = {
+    "🟢 COMPRA FUERTE": 1,
+    "🟢 POSIBLE COMPRA": 2,
+    "🟡 ESPERAR": 3,
+    "🔴 POSIBLE VENTA": 4,
+    "🔴 VENTA FUERTE": 5
+}
+
+# Crear columna auxiliar solo para ordenar por señal
+tabla["orden_resumen"] = tabla["Semáforo Final"].map(orden_semaforo).fillna(99)
+
+# ✅ Orden de prioridad para volatilidad (ATR)
+orden_atr = {
+    "🟢 VOLATILIDAD SANA": 1,
+    "🟡 VOLATIL": 2,
+    "🔴 MUY VOLATIL": 3,
+    "⚪ MUY LENTA": 4,
+    "—": 99,
+    "": 99
+}
+
+# Crear columna auxiliar para ordenar por volatilidad
+tabla["orden_atr"] = tabla["Semáforo ATR"].map(orden_atr).fillna(99)
+
+# ✅ Tabla ordenada para el resumen: primero por señal y luego por volatilidad
+tabla_resumen = tabla.sort_values(["orden_resumen", "orden_atr"], ascending=[True, True])
+
+# ==========================
+# ✅ SETUP PERFECTO (compras)
+# ==========================
+st.subheader("✅ Oportunidad de compra")
+
 def to_float(x):
     try:
         if x is None or x == "":
@@ -23,124 +210,556 @@ def to_float(x):
     except:
         return None
 
-
-def es_setup_perfecto(row: dict) -> bool:
-    """
-    MISMA lógica que Streamlit - Oportunidad de compra
-    """
-
+def es_setup_perfecto(row):
     sem = str(row.get("Semáforo Final", "")).upper()
     atr_sem = str(row.get("Semáforo ATR", "")).upper()
+    score = to_float(row.get("Score", None))
+    riesgo = to_float(row.get("Riesgo%", None))
+    precio = to_float(row.get("Precio", None))
+    soporte = to_float(row.get("Soporte Estadístico", None))
+    medio = to_float(row.get("Precio Medio", None))
+    cara = to_float(row.get("Zona Cara", None))
 
-    score = to_float(row.get("Score"))
-    riesgo = to_float(row.get("Riesgo%"))
-    precio = to_float(row.get("Precio"))
-    soporte = to_float(row.get("Soporte Estadístico"))
-    medio = to_float(row.get("Precio Medio"))
-    cara = to_float(row.get("Zona Cara"))
-
-    # 1️⃣ Señal
+    # 1) Señal (momentum)
     if "COMPRA FUERTE" not in sem and "POSIBLE COMPRA" not in sem:
         return False
 
-    # 2️⃣ Volatilidad sana
+    # 2) Volatilidad operable
     if "SANA" not in atr_sem:
         return False
 
-    # 3️⃣ Score mínimo
+    # 3) Score mínimo
     if score is None or score < 3:
         return False
 
-    # 4️⃣ Riesgo máximo
+    # 4) Riesgo máximo (ATR %)
     if riesgo is None or riesgo > 5:
         return False
 
-    # 5️⃣ Zona de precio
+    # 5) Precio en zona “barata” (P20 a P50) y NO en zona cara
+    #    - si no hay percentiles calculados, no lo considera perfecto
     if precio is None or soporte is None or medio is None or cara is None:
         return False
 
+    # Regla: precio <= P50 (ideal), y evitar que esté muy cerca/arriba de P80
     if precio > medio:
         return False
-
     if precio >= cara:
         return False
 
     return True
 
+tabla_setup = tabla[tabla.apply(es_setup_perfecto, axis=1)].copy()
 
-# =========================================================
-# ENDPOINTS
-# =========================================================
-@app.get("/")
-def root():
-    return {
-        "status": "ok",
-        "message": "Trading Arkangel API activa"
+if tabla_setup.empty:
+    st.info("No hay setups perfectos ahorita. (Busca COMPRA + Volatilidad Sana + Score≥3 + Riesgo≤5% + Precio entre Soporte y Precio Medio)")
+else:
+    # Ordena mejores primero: Compra fuerte > posible compra, mayor score, menor riesgo, más cerca de soporte
+    def prioridad_sem(sem):
+        sem = str(sem).upper()
+        if "COMPRA FUERTE" in sem: return 1
+        if "POSIBLE COMPRA" in sem: return 2
+        return 9
+
+    tabla_setup["prio_sem"] = tabla_setup["Semáforo Final"].apply(prioridad_sem)
+    tabla_setup["riesgo_num"] = tabla_setup["Riesgo%"].apply(to_float)
+    tabla_setup["score_num"] = tabla_setup["Score"].apply(to_float)
+
+    # Distancia a soporte (qué tan “barata” está vs P20)
+    tabla_setup["dist_soporte"] = tabla_setup.apply(
+        lambda r: abs(to_float(r["Precio"]) - to_float(r["Soporte Estadístico"]))
+        if to_float(r["Precio"]) is not None and to_float(r["Soporte Estadístico"]) is not None else 999999,
+        axis=1
+    )
+
+    tabla_setup = tabla_setup.sort_values(
+        by=["prio_sem", "score_num", "riesgo_num", "dist_soporte"],
+        ascending=[True, False, True, True]
+    )
+
+    st.dataframe(
+        tabla_setup[[
+            "Ticker",
+            "Semáforo Final",
+            "Precio",
+            "Soporte Estadístico",
+            "Precio Medio",
+            "Zona Cara",
+            "Score",
+            "Semáforo ATR",
+            "Riesgo%"
+        ]],
+        use_container_width=True
+    )
+
+
+
+
+# ==========================
+# RESUMEN RÁPIDO SUPERIOR
+# ==========================
+import textwrap
+
+# ... tu código arriba ...
+st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
+st.subheader("📌 Resumen rápido (toca la acción para ir a su tarjeta)")
+
+items = []
+#for _, fila in tabla.iterrows():
+for _, fila in tabla_resumen.iterrows():
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
+   
+    item_html = textwrap.dedent(f"""
+<div style="padding:8px 0; border-bottom:1px solid #eee;">
+
+🔗 <a href="javascript:void(0)"
+        onclick="goToTicker('{anchor_id}')"
+        style="text-decoration:none; font-weight:800; color:#0066ff;">
+    {fila["Ticker"]}
+  </a> 
+  
+  &nbsp; — &nbsp;
+  <span style="font-weight:800;">{fila["Semáforo Final"]}</span>
+   &nbsp; | &nbsp;
+  <span style="color:#111;">
+    💲 {fila["Precio"]} 
+    &nbsp; | &nbsp; 🧱 {fila["Soporte Estadístico"]}
+    &nbsp; | &nbsp; ⚖️ {fila["Precio Medio"]}
+    &nbsp; | &nbsp; 🏁 {fila["Zona Cara"]}
+  </span>
+  &nbsp; | &nbsp;
+  <span style="color:#666;">Score: {fila.get("Score","–")}/6</span>
+  &nbsp; — &nbsp;
+  <span style="font-weight:800;">{fila["Semáforo ATR"]}</span>
+  &nbsp; — &nbsp;
+  <span style="font-weight:800;">RIESGO {fila["Riesgo%"]}%</span>
+</div>
+""").strip()
+
+    items.append(item_html)
+
+resumen_html = textwrap.dedent(f"""
+<div style="
+  background-color:#ffffff;
+  padding:16px;
+  border-radius:16px;
+  border:1px solid #dcdcdc;
+  font-family:Arial;
+">
+
+  <script>
+    // Scroll en el documento padre (evita que abra la página dentro del resumen)
+    function goToTicker(id) {{
+      const doc = window.parent.document;
+      const el = doc.getElementById(id);
+      if (el) {{
+        el.scrollIntoView({{ behavior: "smooth", block: "start" }});
+      }}
+    }}
+  </script>
+
+  {''.join(items)}
+</div>
+""").strip()
+
+components.html(resumen_html, height=600, scrolling=True)
+
+
+# ==========================
+# CREA LA TABLA PARA DESCARGAR
+# ==========================
+
+st.subheader("📊 Resultados del Análisis Técnico")
+st.dataframe(tabla, use_container_width=True)
+
+st.download_button(
+    label="📥 Descargar CSV",
+    data=tabla.to_csv(index=False),
+    file_name="resultados_trading.csv",
+    mime="text/csv"
+)
+
+import streamlit.components.v1 as components
+
+# ==========================
+# TARJETAS HTML SIN RESTRICCIÓN
+# ==========================
+st.subheader("📊 Análisis Individual por Acción")
+
+# for _, fila in tabla.iterrows():
+#Agregue este 
+for _, fila in tabla.iterrows():
+    anchor_id = str(fila["Ticker"]).replace(".", "-")
+    st.markdown(
+        f'<div id="{anchor_id}" style="position:relative; top:-80px;"></div>',
+        unsafe_allow_html=True
+    )
+
+  
+    
+    # Color del MACD (basado en números, no en texto)
+    macd_val = float(fila["MACD"])
+    signal_val = float(fila["Signal"])
+    macd_color = "🟢" if macd_val > signal_val else "🔴"
+
+   # RSI semáforo por acción (🟢 comprar | 🟡 esperar | 🔴 vender)
+    rsi_val = float(fila["RSI"])
+    if rsi_val < 30:
+        rsi_estado = "Sobreventa"
+        rsi_color = "🟢"   # Comprar
+    elif rsi_val <= 70:
+        rsi_estado = "Normal"
+        rsi_color = "🟡"   # Esperar
+    else:
+        rsi_estado = "Sobrecompra"
+        rsi_color = "🔴"   # Vender
+
+        # ===== Semáforo EMAs =====
+    tendencia = str(fila["Tendencia"])          # "Alcista" o "Bajista"
+    precio_ema50 = str(fila["Precio EMA50"])    # "Arriba" o "Debajo"
+
+    ema_trend_color = "🟢" if tendencia == "Alcista" else "🔴"
+    precio_ema50_color = "🟢" if precio_ema50 == "Arriba" else "🔴"
+
+    ema50_val = float(fila["EMA50"])
+    ema200_val = float(fila["EMA200"])
+
+    # ===== Semáforo Bollinger (acción) =====
+    boll_estado = str(fila["Bollinger Señal"])  # "Sobreventa", "Normal", "Sobrecompra"
+
+    if boll_estado == "Sobreventa":
+        boll_color = "🟢"   # Comprar
+    elif boll_estado == "Normal":
+        boll_color = "🟡"   # Esperar
+    else:  # "Sobrecompra"
+        boll_color = "🔴"   # Vender
+
+        # ===== Semáforo KDJ =====
+    K_val = float(fila["K"])
+    D_val = float(fila["D"])
+
+    if K_val > D_val:
+        kdj_estado = "Alcista"
+        kdj_color = "🟢"   # Comprar
+    elif abs(K_val - D_val) < 1:
+        kdj_estado = "Neutral"
+        kdj_color = "🟡"   # Esperar
+    else:
+        kdj_estado = "Bajista"
+        kdj_color = "🔴"   # Vender
+
+    # ==========================
+    # SEMÁFORO FINAL (SCORING)
+    # ==========================
+    score = 0
+    razones = []
+
+    # --- MACD ---
+    macd_val = float(fila["MACD"])
+    signal_val = float(fila["Signal"])
+    if macd_val > signal_val:
+        score += 1
+        razones.append("MACD alcista")
+    else:
+        score -= 1
+        razones.append("MACD bajista")
+
+    # --- RSI ---
+    rsi_val = float(fila["RSI"])
+    if rsi_val < 30:
+        score += 1
+        razones.append("RSI sobreventa (<30)")
+    elif rsi_val > 70:
+        score -= 1
+        razones.append("RSI sobrecompra (>70)")
+    else:
+        razones.append("RSI normal (30–70)")
+
+    # --- Bollinger ---
+    boll_estado = str(fila["Bollinger Señal"])
+    if boll_estado == "Sobreventa":
+        score += 1
+        razones.append("Bollinger sobreventa")
+    elif boll_estado == "Sobrecompra":
+        score -= 1
+        razones.append("Bollinger sobrecompra")
+    else:
+        razones.append("Bollinger normal")
+
+    # --- Tendencia (EMA50 vs EMA200) ---
+    tendencia = str(fila["Tendencia"])
+    if tendencia == "Alcista":
+        score += 1
+        razones.append("Tendencia alcista (EMA50>EMA200)")
+    else:
+        score -= 1
+        razones.append("Tendencia bajista (EMA50<EMA200)")
+
+    # --- Precio vs EMA50 (timing) ---
+    precio_ema50 = str(fila["Precio EMA50"])
+    if precio_ema50 == "Arriba":
+        score += 1
+        razones.append("Precio arriba EMA50")
+    else:
+        score -= 1
+        razones.append("Precio debajo EMA50")
+
+    # --- KDJ ---
+    K_val = float(fila["K"])
+    D_val = float(fila["D"])
+    if K_val > D_val:
+        score += 1
+        razones.append("KDJ alcista (K>D)")
+    else:
+        score -= 1
+        razones.append("KDJ bajista (K<D)")
+
+    # --- Interpretación del score ---
+    if score >= 4:
+        semaforo_final = "🟢 COMPRA FUERTE"
+    elif score >= 2:
+        semaforo_final = "🟢 POSIBLE COMPRA"
+    elif score <= -4:
+        semaforo_final = "🔴 VENTA FUERTE"
+    elif score <= -2:
+        semaforo_final = "🔴 POSIBLE VENTA"
+    else:
+        semaforo_final = "🟡 ESPERAR"
+
+    # Explicación corta (top 4 razones)
+    explicacion_score = " | ".join(razones[:4]) + (" | ..." if len(razones) > 4 else "")
+
+    
+    html = f"""
+    <div style="
+    background-color:#ffffff;
+    padding:25px;
+    border-radius:20px;
+    margin-bottom:25px;
+    border:1px solid #cccccc;
+    font-family:Arial;
+
+#    max-height: 820px;
+#    overflow-y: auto;
+#    -webkit-overflow-scrolling: touch;
+">
+
+
+        <h2 style="margin:0; font-size:26px;">
+            📌 <strong>{fila['Ticker']}</strong> —
+            <span style="color:#0066ff;">{fila['Señal Final']}</span>
+        </h2>
+
+        <p style="font-size:18px; margin-top:10px;">
+            💲 <strong>Precio actual:</strong> {fila['Precio']}
+        </p>
+
+        <h3 style="margin-top:20px;">🚦 Semáforo Final (Score)</h3>
+        <p style="font-size:17px;">
+            <strong>{semaforo_final}</strong><br>
+            <strong>Score:</strong> {score} / 6<br>
+            <small>{explicacion_score}</small>
+        </p>
+
+        <h3 style="margin-top:20px;">🎯 Gestión de riesgo (ATR)</h3>
+        <p style="font-size:17px;">
+            <strong>{fila["Semáforo ATR"]}</strong><br>    
+            <strong>ATR(14):</strong> {fila.get('ATR14','')} &nbsp; | &nbsp;
+            <strong>ATR%:</strong> {fila.get('ATR%','')}%<br>
+            <strong>Tipo de Stop:</strong> {fila.get('Tipo Stop','—')}<br>
+            <strong>Stop sugerido:</strong> {fila.get('Stop Sugerido','')}<br>
+            <strong>TP1:</strong> {fila.get('TP1','')} &nbsp; | &nbsp;
+            <strong>TP2:</strong> {fila.get('TP2','')}<br>
+            <strong>Riesgo%:</strong> {fila.get('Riesgo%','')}%
+        </p>
+
+
+        <h3 style="margin-top:20px;">📉 MACD</h3>
+        <p style="font-size:17px;">
+        {macd_color} <strong>{fila['MACD Señal']}</strong><br>
+        <strong>MACD:</strong> {fila['MACD']}<br>
+        <strong>Signal:</strong> {fila['Signal']}
+        </p>
+
+        <h3 style="margin-top:20px;">📊 RSI (14)</h3>
+        <p style="font-size:17px;">
+        {rsi_color} <strong>{rsi_estado}</strong><br>
+         RSI: {rsi_val:.2f}<br>
+        Rangos: Sobreventa &lt; 30 | Normal 30–70 | Sobrecompra &gt; 70
+        </p>
+
+        <h3 style="margin-top:20px;">📉 Bollinger (Volatilidad)</h3>
+        <p style="font-size:17px;">
+            {boll_color} <strong>Estado:</strong> {boll_estado}<br>
+            <strong>Banda Superior:</strong> {fila['Banda Superior']}<br>
+            <strong>Banda Inferior:</strong> {fila['Banda Inferior']}<br>
+            <small>
+                Interpretación: 🟢 precio bajo banda inferior (zona compra) |
+                🟡 dentro del canal (esperar) |
+                🔴 sobre banda superior (zona venta)
+            </small>
+        </p>
+
+        <h3 style="margin-top:20px;">📊 KDJ (Momentum)</h3>
+        <p style="font-size:17px;">
+            {kdj_color} <strong>{kdj_estado}</strong><br>
+            <strong>K:</strong> {fila['K']}<br>
+            <strong>D:</strong> {fila['D']}<br>
+            <strong>J:</strong> {fila['J']}<br>
+            <small>
+                Interpretación: 🟢 K&gt;D (impulso alcista) |
+                🟡 K≈D (sin dirección) |
+                🔴 K&lt;D (impulso bajista)
+            </small>
+        </p>
+
+    
+        <h3 style="margin-top:20px;">📈 Tendencia (EMAs)</h3>
+        <p style="font-size:17px;">
+            {ema_trend_color} <strong>EMA50 vs EMA200:</strong> {tendencia}<br>
+            <strong>EMA50:</strong> {ema50_val:.2f}<br>
+            <strong>EMA200:</strong> {ema200_val:.2f}
+        </p>
+
+        <h3 style="margin-top:15px;">⏱️ Reacción (Precio vs EMA50)</h3>
+        <p style="font-size:17px;">
+            {precio_ema50_color} <strong>Precio vs EMA50:</strong> {precio_ema50}
+        </p>
+
+        
+    </div>
+    """
+
+    components.html(html, height=1280)
+components.html(
+"""
+<script>
+(function () {
+  const doc = window.parent.document;
+
+  // Si ya existe, no lo recreamos, pero sí aseguramos que el click funcione
+  let btn = doc.getElementById("scrollTopBtn");
+
+  if (!btn) {
+    btn = doc.createElement("button");
+    btn.id = "scrollTopBtn";
+    btn.innerHTML = "⬆";
+    btn.title = "Subir al inicio";
+
+    btn.style.position = "fixed";
+    btn.style.bottom = "190px";
+    btn.style.right = "20px";
+    btn.style.zIndex = "999999";
+    btn.style.background = "#0066ff";
+    btn.style.color = "white";
+    btn.style.border = "none";
+    btn.style.borderRadius = "50%";
+    btn.style.width = "55px";
+    btn.style.height = "55px";
+    btn.style.fontSize = "26px";
+    btn.style.cursor = "pointer";
+    btn.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+
+    doc.body.appendChild(btn);
+  }
+
+  function goTop() {
+    const topEl = doc.getElementById("top");
+
+    // 1) Si existe el ancla, esta es la forma más confiable:
+    if (topEl && topEl.scrollIntoView) {
+      try {
+        topEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      } catch (e) {}
     }
 
+    // 2) Fallback (por si el ancla aún no está renderizada):
+    try { doc.documentElement.scrollTop = 0; } catch (e) {}
+    try { doc.body.scrollTop = 0; } catch (e) {}
+    try { window.parent.scrollTo({ top: 0, left: 0, behavior: "smooth" }); } catch (e) {}
+    try { window.parent.scrollTo(0, 0); } catch (e) {}
+  }
 
-@app.get("/oportunidad-compra")
-def oportunidad_compra(market: str = Query("MX")):
-    """
-    Devuelve SOLO setups perfectos.
-    Si no hay ninguno -> total = 0 y setups = []
-    """
+  // Re-asignar handler SIEMPRE (porque Streamlit re-renderiza)
+  btn.onclick = goTop;
 
-    try:
-        acciones = acciones_mx if market.upper() == "MX" else acciones_usa
+  // Reintento automático si el DOM cambia y el "top" aparece después
+  // (pasa al cambiar selector MX/USA)
+  const obs = new MutationObserver(() => {
+    const topEl = doc.getElementById("top");
+    if (topEl) {
+      // ya existe, no necesitamos observar más
+      obs.disconnect();
+    }
+  });
 
-        batch = descargar_batch(acciones, period="2y", interval="1d")
+  try {
+    obs.observe(doc.body, { childList: true, subtree: true });
+    setTimeout(() => { try { obs.disconnect(); } catch(e){} }, 8000);
+  } catch(e) {}
+})();
+</script>
+""",
+height=0,
+)
 
-        tz_mx = pytz.timezone("America/Mazatlan")
-        timestamp = datetime.now(tz_mx).strftime("%Y-%m-%d %H:%M:%S")
 
-        resultados = []
 
-        for ticker in acciones:
 
-            # Validar que venga en batch
-            if not isinstance(batch.columns, pd.MultiIndex):
-                continue
 
-            if ticker not in batch.columns.get_level_values(0):
-                continue
 
-            df = batch[ticker].dropna()
-            r = analizar_con_data(ticker, df)
 
-            if not r:
-                continue
 
-            # 👉 FILTRO REAL DE SETUP PERFECTO
-            if not es_setup_perfecto(r):
-                continue
 
-            resultados.append({
-                "ticker": r["Ticker"],
-                "senal": r["Semáforo Final"],
-                "precio": r["Precio"],
-                "soporte": r["Soporte Estadístico"],
-                "precio_medio": r["Precio Medio"],
-                "zona_cara": r["Zona Cara"],
-                "score": r["Score"],
-                "riesgo_pct": r["Riesgo%"],
-                "atr_pct": r["ATR%"],
-                "stop": r["Stop Sugerido"],
-                "tp1": r["TP1"],
-                "tp2": r["TP2"],
-                "timestamp": timestamp
-            })
 
-        return {
-            "status": "ok",
-            "market": market.upper(),
-            "hay_oportunidad": len(resultados) > 0,
-            "total": len(resultados),
-            "setups": resultados
-        }
 
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
