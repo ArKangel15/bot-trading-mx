@@ -3,15 +3,15 @@ import pandas as pd
 import streamlit.components.v1 as components
 import json
 from urllib.parse import parse_qs
+from datetime import datetime
+import pytz
+
 from bot_trading import (
     descargar_batch,
     analizar_con_data,    
     acciones_mx,
     acciones_usa,
 )
-
-from datetime import datetime
-import pytz
 
 st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 st.set_page_config(page_title="Trading by Arkangel", layout="wide")
@@ -703,6 +703,7 @@ components.html(
 """,
 height=0,
 )
+
 
 
 
