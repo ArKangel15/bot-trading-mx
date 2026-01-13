@@ -372,11 +372,9 @@ acciones_mx = [
     "BBVA.MX",
     "SORIANA.MX",
     "CTAXTELA.MX",
-    "MEGACPO.MX",
     "KOFUBL.MX",
     "AGUA.MX",
     "FMX23.MX",
-    "FUNO11.MX",
     "LASITE.MX",
     "POCHTECB.MX",
     "SIGMAFA.MX",
@@ -600,6 +598,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
