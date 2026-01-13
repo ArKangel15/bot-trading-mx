@@ -355,7 +355,47 @@ acciones_mx = [
     "UNIFINA.MX",
     "STORAGE18.MX",
     "Q.MX",
-    "NESNN.MX"
+    "NESNN.MX",
+    "FEXI21.MX",
+    "VASCONI.MX",
+    "FIBRAHD.MX",
+    "FIBRAMQ12.MX",
+    "SPORTS.MX",
+    "MFRISCOA-1.MX",
+    "AERO.MX",
+    "FRAGUAB.MX",
+    "FHIPO14.MX",
+    "FEMSAUBD.MX",
+    "FIHO12.MX",
+    "BOLSAA.MX",
+    "FCFE18.MX",
+    "BBVA.MX",
+    "SORIANA.MX",
+    "CTAXTELA.MX",
+    "MEGACPO.MX",
+    "KOFUBL.MX",
+    "AGUA.MX",
+    "FMX23.MX",
+    "FUNO11.MX",
+    "LASITE.MX",
+    "POCHTECB.MX",
+    "SIGMAFA.MX",
+    "ESENTIAII.MX",
+    "ACCELSAB.MX",
+    "ACTINVRB.MX",
+    "AEROMEX.MX",
+    "ALETIC.MX",
+    "ALFAA.MX",
+    "ANB.MX",
+    "AXTELCPO.MX",
+    "BACHOCOB.MX",
+    "BAFARB.MX",
+    "BEVIDESB.MX",
+    "BSMXB.MX",
+    "CABLECPO.MX",
+    "CADUA.MX",
+    "CERAMICB.MX",
+    "CIDMEGA.MX",
 ]
 
 # ============================================================
@@ -560,6 +600,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
