@@ -385,7 +385,6 @@ acciones_mx = [
     "ALETIC.MX",
     "ALFAA.MX",
     "ANB.MX",
-    "AXTELCPO.MX",
     "BACHOCOB.MX",
     "BAFARB.MX",
     "BEVIDESB.MX",
@@ -599,6 +598,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
