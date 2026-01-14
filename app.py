@@ -17,7 +17,7 @@ st.markdown('<div id="top"></div>', unsafe_allow_html=True)
 st.set_page_config(page_title="Trading by Arkangel", layout="wide")
 
 st.title("📈 Trading de Acciones by Arkangel")
-st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ART")
+st.write("Análisis técnico con MACD + Bollinger + KDJ + RSI + EMAs + ATR")
 
 
 
@@ -304,10 +304,21 @@ import textwrap
 st.markdown('<div id="resumen"></div>', unsafe_allow_html=True)
 st.subheader("📌 Resumen rápido (toca la acción para ir a su tarjeta)")
 
+busqueda = st.text_input(
+    "🔎 Buscar acción (ticker)",
+    placeholder="Ejemplo: WALMEX, AAPL, NVDA"
+).upper().strip()
+
+tabla_filtrada = tabla_resumen.copy()
+if busqueda:
+    tabla_filtrada = tabla_filtrada[
+        tabla_filtrada["Ticker"].str.contains(busqueda, case=False, na=False)
+    ]
+
 items = []
-#for _, fila in tabla.iterrows():
-for _, fila in tabla_resumen.iterrows():
-    anchor_id = str(fila["Ticker"]).replace(".", "-")
+
+for _, fila in tabla_filtrada.iterrows():
+    anchor_id = fila["Ticker"].replace(".", "-")
    
     item_html = textwrap.dedent(f"""
 <div style="padding:8px 0; border-bottom:1px solid #eee;">
@@ -703,3 +714,4 @@ components.html(
 """,
 height=0,
 )
+
