@@ -221,3 +221,84 @@ def oportunidad_compra(market: str = Query("MX")):
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+@app.get("/accion")
+def consultar_accion(
+    ticker: str = Query(..., description="Ticker a consultar"),
+    market: str = Query("MX", description="MX o USA")
+):
+    try:
+        ticker = ticker.upper().strip()
+
+        acciones = acciones_mx if market.upper() == "MX" else acciones_usa
+
+        # Normalizar ticker MX
+        if market.upper() == "MX" and not ticker.endswith(".MX"):
+            ticker = f"{ticker}.MX"
+
+        if ticker not in acciones:
+            return {
+                "status": "ok",
+                "found": False,
+                "message": f"{ticker} no está en la lista del mercado {market.upper()}"
+            }
+
+        batch = descargar_batch([ticker], period="2y", interval="1d")
+
+        if not isinstance(batch.columns, pd.MultiIndex):
+            return {
+                "status": "error",
+                "message": "Respuesta inválida de yfinance"
+            }
+
+        if ticker not in batch.columns.get_level_values(0):
+            return {
+                "status": "ok",
+                "found": False,
+                "message": "No hay datos para el ticker"
+            }
+
+        df = batch[ticker].dropna()
+        r = analizar_con_data(ticker, df)
+        if not r:
+            return {
+                "status": "ok",
+                "found": False,
+                "message": "No se pudo analizar la acción"
+            }
+
+        # Score + Semáforo
+        score, sem_final = calcular_score_y_semaforo(r)
+        r["Score"] = score
+        r["Semáforo Final"] = sem_final
+
+        # Semáforo ATR
+        r["Semáforo ATR"] = semaforo_atr(r.get("ATR%"))
+
+        tz = pytz.timezone("America/Mazatlan")
+        r["timestamp"] = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
+
+        return {
+            "status": "ok",
+            "found": True,
+            "accion": {
+                "ticker": r.get("Ticker"),
+                "precio": r.get("Precio"),
+                "semaforo": r.get("Semáforo Final"),
+                "score": r.get("Score"),
+                "atr_pct": r.get("ATR%"),
+                "semaforo_atr": r.get("Semáforo ATR"),
+                "soporte": r.get("Soporte Estadístico"),
+                "precio_medio": r.get("Precio Medio"),
+                "zona_cara": r.get("Zona Cara"),
+                "stop": r.get("Stop Sugerido"),
+                "tp1": r.get("TP1"),
+                "tp2": r.get("TP2"),
+                "riesgo_pct": r.get("Riesgo%"),
+                "timestamp": r.get("timestamp"),
+            }
+        }
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
