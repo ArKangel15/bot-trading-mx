@@ -359,7 +359,7 @@ acciones_mx = [
     "FEXI21.MX",
     "VASCONI.MX",
     "FIBRAHD.MX",
-    "FIBRAMQ12.MX",
+    "TERRA13.MX",
     "SPORTS.MX",
     "MFRISCOA-1.MX",
     "AERO.MX",
@@ -598,6 +598,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
