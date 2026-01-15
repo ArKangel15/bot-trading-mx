@@ -301,4 +301,21 @@ def consultar_accion(
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+@app.get("/buscar")
+def buscar_accion(q: str, market: str = "MX"):
+    q = q.upper().strip()
+
+    acciones = acciones_mx if market.upper() == "MX" else acciones_usa
+
+    resultados = [
+        a for a in acciones
+        if q in a.upper()
+    ][:10]  # máximo 10 sugerencias
+
+    return {
+        "status": "ok",
+        "query": q,
+        "resultados": resultados
+    }
+
 
