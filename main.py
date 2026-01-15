@@ -301,21 +301,42 @@ def consultar_accion(
 
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
 @app.get("/buscar")
-def buscar_accion(q: str, market: str = "MX"):
-    q = q.upper().strip()
+def buscar_accion(
+    q: str = Query(..., min_length=1),
+    market: str = Query("MX")
+):
+    """
+    Busca una acción por texto libre.
+    - Si existe exacta → found = true
+    - Si no existe → found = false + suggestions[]
+    """
+
+    q = q.strip().upper()
 
     acciones = acciones_mx if market.upper() == "MX" else acciones_usa
 
-    resultados = [
-        a for a in acciones
-        if q in a.upper()
-    ][:10]  # máximo 10 sugerencias
+    # 1️⃣ Coincidencia exacta
+    if q in acciones:
+        return {
+            "status": "ok",
+            "found": True,
+            "ticker": q
+        }
+
+    # 2️⃣ Coincidencias parciales (autocomplete)
+    starts_with = [a for a in acciones if a.startswith(q)]
+    contains = [a for a in acciones if q in a and a not in starts_with]
+
+    # Prioridad: empieza con > contiene
+    sugerencias = (starts_with + contains)[:8]
 
     return {
         "status": "ok",
+        "found": False,
         "query": q,
-        "resultados": resultados
+        "suggestions": sugerencias,
+        "message": f"{q} no está en la lista del mercado {market.upper()}"
     }
-
-
