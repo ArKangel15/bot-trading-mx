@@ -338,7 +338,6 @@ acciones_mx = [
     "GIGANTE.MX",
     "ICHB.MX",
     "GFMULTIO.MX",
-    "CIDMEGA.MX",
     "FINAMEXO.MX",
     "BAFARB.MX",
     "FPLUS16.MX",
@@ -600,6 +599,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
