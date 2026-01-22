@@ -394,7 +394,8 @@ acciones_mx = [
     "CIDMEGA.MX",
     "NUN.MX",
     "LIVEPOLC-1.MX",
-    "AVGO.MX"
+    "AVGO.MX",
+    "CABLECPO.MX"
 ]
 
 # ============================================================
@@ -599,6 +600,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
