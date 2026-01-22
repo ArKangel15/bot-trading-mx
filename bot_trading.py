@@ -299,7 +299,6 @@ acciones_mx = [
     "CEMEXCPO.MX",
     "GENTERA.MX",
     "WALMEX.MX",
-    "FEMSAUBD.MX",
     "PEP.MX",
     "COST.MX",
     "MELIN.MX",
@@ -600,6 +599,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
