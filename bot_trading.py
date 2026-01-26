@@ -397,7 +397,7 @@ acciones_mx = [
     "CABLECPO.MX",
     "UBER.MX",
     "GMD.MX"
-    "BWMX.MX"
+    "BWMX"
 ]
 
 # ============================================================
@@ -602,6 +602,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
