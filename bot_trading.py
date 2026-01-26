@@ -398,7 +398,8 @@ acciones_mx = [
     "UBER.MX",
     "GMD.MX",
     "BWMX",
-    "NUTRISAA.MX"
+    "NUTRISAA.MX",
+    "CULTIBAB.MX"
 ]
 
 # ============================================================
@@ -603,6 +604,7 @@ acciones_usa = [
     "OFLX",
     "SNGX"
 ]
+
 
 
 
